@@ -52,7 +52,7 @@ struct Assignment {
     submissions_download_url: String,
     assignment_group_id: u64,
     due_date_required: bool,
-    allowed_extensions: Vector<String>,
+    allowed_extensions: Vec<String>,
     max_name_length: u64,
     turnitin_enabled: bool,
     vericite_enabled: bool,
@@ -70,7 +70,7 @@ struct Assignment {
     post_to_sis: bool,
     // 3rd party integration data here
     points_possible: f32,
-    submission_types: Vector<SubmissionType>,
+    submission_types: Vec<SubmissionType>,
     has_submitted_submissions: bool,
     grading_type: GradingType,
     grading_standard_id: Option<u64>,
