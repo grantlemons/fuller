@@ -2,6 +2,13 @@ use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]
+struct Course; // TODO: Expand
+#[derive(Debug, Deserialize)]
+struct SubmissionComment; // TODO: Expand
+#[derive(Debug, Deserialize)]
+struct LateStatus; // TODO: Expand
+
+#[derive(Debug, Deserialize)]
 struct Submission {
     assignment_id: u64,
     // assignment: Option<Assignment>,
@@ -155,24 +162,13 @@ enum ContextType {
     Group,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Deserialize)]
 enum TodoType {
     Submitting,
     Grading,
 }
 
 // GET /api/v1/courses/:course_id/todo
-//
-// Example Response
-// [{
-//   'type': 'submitting', (submitting|grading)
-//   'assignment': Assignment Object,
-//   'ignore': Url, (String)
-//   'ignore_permanently': Url, (String)
-//   'html_url': Url, (String)
-//   'context_type': 'course', (course|group)
-//   'course_id': 1,
-// }]
 #[derive(Debug, Deserialize)]
 struct TodoBody {
     #[serde(alias = "type")]
