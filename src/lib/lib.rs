@@ -1,3 +1,4 @@
+use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]
@@ -14,12 +15,12 @@ struct Submission {
     score: f32,
     submission_comments: Option<Vec<SubmissionComment>>,
     submission_type: SubmissionType,
-    submitted_at: String, // ISO 8601
+    submitted_at: DateTime<Local>,
     url: Option<String>,
     user_id: u64,
-    grader_id: Option<u64>,
-    graded_at: Option<String>, // ISO 8601
     // user: Option<User>,
+    grader_id: Option<u64>,
+    graded_at: Option<DateTime<Local>>,
     late: bool,
     assignment_visible: bool,
     excused: bool,
@@ -27,12 +28,6 @@ struct Submission {
     late_policy_status: LateStatus,
     points_deducted: f32,
     seconds_late: u64,
-    workflow_state: String,
-    extra_attempts: u64,
-    anonymous_id: Option<String>,
-    posted_at: String, // ISO 8601
-    read_status: Option<String>,
-    redo_request: bool,
 }
 
 #[derive(Debug, Deserialize)]
@@ -40,11 +35,11 @@ struct Assignment {
     id: u64,
     name: String,
     description: String,
-    created_at: String, // ISO 8601
-    updated_at: String, // ISO 8601
-    due_at: String,     // ISO 8601
-    lock_at: String,    // ISO 8601
-    unlock_at: String,  // ISO 8601
+    created_at: DateTime<Local>,
+    updated_at: DateTime<Local>,
+    due_at: DateTime<Local>,
+    lock_at: DateTime<Local>,
+    unlock_at: DateTime<Local>,
     has_overrides: bool,
     all_dates: Option<()>,
     course_id: u64,
@@ -62,7 +57,7 @@ struct Assignment {
     peer_reviews: bool,
     automatic_peer_reviews: bool,
     peer_review_count: u64,
-    peer_reviews_assign_at: String, // ISO 8601
+    peer_reviews_assign_at: DateTime<Local>,
     intra_group_peer_reviews: bool,
     group_category_id: u64,
     // grading info here
