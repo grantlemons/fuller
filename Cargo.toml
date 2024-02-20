@@ -13,6 +13,7 @@ path = "src/main.rs"
 
 [dependencies]
 anyhow = "1.0.79"
+chrono = { version = "0.4.34", features = ["serde"] }
 clap = { version = "4.5.0", features = ["derive"] }
 inquire = "0.6.2"
 itertools = "0.12.1"
