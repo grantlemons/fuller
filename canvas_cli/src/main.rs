@@ -1,5 +1,7 @@
 use canvas_api::*;
+use canvas_oauth::connect;
 
-fn main() {
-    println!("Hello, world!");
+#[tokio::main]
+async fn main() {
+    let auth_token = connect().await.unwrap();
 }
