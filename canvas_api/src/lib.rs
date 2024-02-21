@@ -1,9 +1,11 @@
 pub mod types {
-    pub mod assignment;
-    pub mod submission;
-    pub mod todo;
+    mod assignment;
+    mod course;
+    mod submission;
+    mod todo;
 
     pub use assignment::*;
+    pub use course::*;
     pub use submission::*;
     pub use todo::*;
 }

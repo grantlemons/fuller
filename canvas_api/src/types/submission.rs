@@ -1,3 +1,4 @@
+use super::Course;
 use chrono::{DateTime, Local};
 use serde::Deserialize;
 
@@ -56,5 +57,3 @@ pub enum SubmissionType {
 pub struct SubmissionComment; // TODO: Expand
 #[derive(Debug, Deserialize)]
 pub struct LateStatus; // TODO: Expand
-#[derive(Debug, Deserialize)]
-pub struct Course; // TODO: Expand

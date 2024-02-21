@@ -1,7 +1,7 @@
 use super::Assignment;
 use serde::Deserialize;
 
-// GET /api/v1/courses/:course_id/todo
+// GET /api/v1/users/self/todo
 #[derive(Debug, Deserialize)]
 pub struct Todo {
     #[serde(alias = "type")]
@@ -13,7 +13,7 @@ pub struct Todo {
     pub ignore_permanently_url: String,
     pub html_url: String,
     pub context_type: TodoContextType,
-    pub group_id: u64,
+    pub group_id: Option<u64>,
 }
 
 #[derive(Debug, Deserialize)]

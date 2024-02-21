@@ -1,0 +1,20 @@
+[package]
+name = "canvas_cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+canvas_api = { path = "../canvas_api" }
+canvas_oauth = { path = "../canvas_oauth" }
+anyhow = "1.0.79"
+chrono = { version = "0.4.34", features = ["serde"] }
+clap = { version = "4.5.0", features = ["derive"] }
+inquire = "0.6.2"
+itertools = "0.12.1"
+reqwest = "0.11.24"
+serde = { version = "1.0.196", features = ["serde_derive"] }
+serde_json = "1.0.113"
+termcolor = "1.4.1"
+thiserror = "1.0.56"
+tokio = "1.36.0"
+tracing = "0.1.40"
