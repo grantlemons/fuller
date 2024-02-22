@@ -15,9 +15,7 @@ async fn get_generic<T: crate::types::ResponseType>(
         Some(q) => request.query(q).send().await?,
         None => request.send().await?,
     };
-    let response = response.json::<T>().await;
-    println!("{:#?}", response);
-    response
+    response.json::<T>().await
 }
 
 pub fn create_client(auth_token: &str) -> Result<Client> {

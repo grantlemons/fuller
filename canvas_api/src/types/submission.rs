@@ -1,5 +1,5 @@
 use super::Course;
-use chrono::{DateTime, Local};
+use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
@@ -15,11 +15,11 @@ pub struct Submission {
     pub score: f32,
     pub submission_comments: Option<Vec<SubmissionComment>>,
     pub submission_type: SubmissionType,
-    pub submitted_at: DateTime<Local>,
+    pub submitted_at: DateTime<Utc>,
     pub url: Option<String>,
     pub user_id: u64,
     pub grader_id: Option<u64>,
-    pub graded_at: Option<DateTime<Local>>,
+    pub graded_at: Option<DateTime<Utc>>,
     pub late: bool,
     pub assignment_visible: bool,
     pub excused: bool,

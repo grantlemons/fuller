@@ -4,8 +4,9 @@ use serde::Deserialize;
 // GET /api/v1/users/self/todo
 #[derive(Debug, Deserialize)]
 pub struct Todo {
-    #[serde(alias = "type")]
-    pub todo_type: TodoType,
+    pub course_id: u64,
+    pub context_name: String,
+    // pub todo_type: TodoType,
     pub assignment: Assignment,
     #[serde(alias = "ignore")]
     pub ignore_url: String,

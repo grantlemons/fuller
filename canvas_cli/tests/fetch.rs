@@ -1,8 +1,7 @@
-use canvas_api::create_client;
-use canvas_auth::connect;
+use anyhow::Context;
 
 #[tokio::test]
-async fn test_self_info() {
+async fn test_self_info() -> anyhow::Result<()> {
     let auth_token = canvas_auth::connect()
         .await
         .context("Fetching Auth Token Failed!")?;
@@ -11,10 +10,12 @@ async fn test_self_info() {
 
     let profile = canvas_api::requests::get_self(client).await;
     assert!(profile.is_ok());
+
+    Ok(())
 }
 
 #[tokio::test]
-async fn test_self_todo() {
+async fn test_todo() -> anyhow::Result<()> {
     let auth_token = canvas_auth::connect()
         .await
         .context("Fetching Auth Token Failed!")?;
@@ -23,4 +24,6 @@ async fn test_self_todo() {
 
     let todo = canvas_api::requests::get_todo(client).await;
     assert!(todo.is_ok());
+
+    Ok(())
 }

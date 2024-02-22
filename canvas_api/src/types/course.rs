@@ -1,4 +1,4 @@
-use chrono::{DateTime, Local};
+use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
@@ -8,8 +8,8 @@ pub struct Course {
     pub name: String,
     pub course_code: String,
     pub workflow_state: WorkflowState,
-    pub start_at: DateTime<Local>,
-    pub end_at: DateTime<Local>,
+    pub start_at: DateTime<Utc>,
+    pub end_at: DateTime<Utc>,
 }
 
 impl crate::types::ResponseType for Course {}

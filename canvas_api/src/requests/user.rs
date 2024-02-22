@@ -6,5 +6,5 @@ pub async fn get_profile(client: Client, user_id: u64) -> Result<Profile> {
 }
 
 pub async fn get_self(client: Client) -> Result<Profile> {
-    super::get_generic(client, &format!("/api/v1/users/self/profile"), None).await
+    super::get_generic(client, "/api/v1/users/self/profile", None).await
 }

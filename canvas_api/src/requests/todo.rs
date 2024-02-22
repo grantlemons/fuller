@@ -1,7 +1,7 @@
 use crate::types::Todo;
 use reqwest::{Client, Result};
 
-pub async fn get_todo(client: Client) -> Result<Todo> {
+pub async fn get_todo(client: Client) -> Result<Vec<Todo>> {
     super::get_generic(client, "/api/v1/users/self/todo", None).await
 }
 
