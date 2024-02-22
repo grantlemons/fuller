@@ -1,7 +1,10 @@
-use canvas_api::*;
-use canvas_auth::connect;
+use anyhow::Context;
 
 #[tokio::main]
-async fn main() {
-    let auth_token = connect().await.unwrap();
+async fn main() -> anyhow::Result<()> {
+    let auth_token = canvas_auth::connect().await.unwrap();
+    let _client =
+        canvas_api::create_client(auth_token.secret()).context("Creating Client Failed!")?;
+
+    Ok(())
 }

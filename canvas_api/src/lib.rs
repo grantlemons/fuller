@@ -13,3 +13,4 @@ pub mod types {
 }
 
 pub mod requests;
+pub use requests::create_client;
