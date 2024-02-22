@@ -13,3 +13,5 @@ pub struct Profile {
     pub avatar_url: String,
     pub time_zone: String,
 }
+
+impl crate::types::ResponseType for Profile {}

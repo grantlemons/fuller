@@ -5,7 +5,7 @@ use reqwest::{
 
 const BASE_URL: &str = "https://elearning.mines.edu";
 
-async fn get_generic<'a, T: serde::de::DeserializeOwned>(
+async fn get_generic<T: crate::types::ResponseType>(
     client: reqwest::Client,
     path: &str,
     query: Option<&[(&str, &str)]>,
@@ -15,7 +15,9 @@ async fn get_generic<'a, T: serde::de::DeserializeOwned>(
         Some(q) => request.query(q).send().await?,
         None => request.send().await?,
     };
-    response.json::<T>().await
+    let response = response.json::<T>().await;
+    println!("{:#?}", response);
+    response
 }
 
 pub fn create_client(auth_token: &str) -> Result<Client> {

@@ -16,6 +16,8 @@ pub struct Todo {
     pub group_id: Option<u64>,
 }
 
+impl crate::types::ResponseType for Todo {}
+
 #[derive(Debug, Deserialize)]
 pub enum TodoType {
     Submitting,

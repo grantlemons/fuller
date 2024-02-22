@@ -12,6 +12,8 @@ pub struct Course {
     pub end_at: DateTime<Local>,
 }
 
+impl crate::types::ResponseType for Course {}
+
 #[derive(Debug, Deserialize)]
 pub enum WorkflowState {
     Unpublished,

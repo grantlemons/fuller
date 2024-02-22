@@ -29,6 +29,8 @@ pub struct Submission {
     pub seconds_late: u64,
 }
 
+impl crate::types::ResponseType for Submission {}
+
 #[derive(Debug, Deserialize)]
 pub enum SubmissionType {
     #[serde(alias = "discussion_topic")]

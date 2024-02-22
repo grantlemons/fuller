@@ -57,6 +57,8 @@ pub struct Assignment {
     pub is_quiz_assignment: bool,
 }
 
+impl crate::types::ResponseType for Assignment {}
+
 #[derive(Debug, Deserialize)]
 pub enum GradingType {
     #[serde(alias = "pass_fail")]
