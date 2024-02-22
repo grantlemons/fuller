@@ -1,5 +1,6 @@
 #![allow(unused)]
 
+use crate::AuthError;
 use oauth2::basic::{BasicClient, BasicTokenType};
 use oauth2::reqwest::async_http_client;
 use oauth2::url::{ParseError, Url};
@@ -44,24 +45,27 @@ fn generate_redirect_url(client: &BasicClient, challenge: PkceCodeChallenge) -> 
 async fn get_token(
     client: &BasicClient,
     verifier: PkceCodeVerifier,
-) -> StandardTokenResponse<EmptyExtraTokenFields, BasicTokenType> {
+) -> Result<StandardTokenResponse<EmptyExtraTokenFields, BasicTokenType>, AuthError> {
     let auth_code = AuthorizationCode::new("".to_owned());
 
-    client
+    let res = client
         .exchange_code(auth_code)
         .set_pkce_verifier(verifier)
         .request_async(async_http_client)
-        .await
-        .unwrap()
+        .await;
+    match res {
+        Ok(res) => Ok(res),
+        Err(_) => Err(AuthError::OAuthError),
+    }
 }
 
-pub async fn connect() -> Result<AccessToken, ()> {
-    let client = create_client().unwrap();
+pub async fn connect() -> Result<AccessToken, AuthError> {
+    let client = create_client()?;
     let (challenge, verifier) = generate_pkce();
     let redirect_url = generate_redirect_url(&client, challenge);
     println!("Access redirect here: {}", redirect_url);
 
-    let response = get_token(&client, verifier).await;
+    let response = get_token(&client, verifier).await?;
 
     let access_token = response.access_token();
     let expires_in = response.expires_in();
