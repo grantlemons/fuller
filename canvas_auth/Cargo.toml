@@ -1,5 +1,5 @@
 [package]
-name = "canvas_oauth"
+name = "canvas_auth"
 version = "0.1.0"
 edition = "2021"
 

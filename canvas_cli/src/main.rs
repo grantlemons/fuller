@@ -1,5 +1,5 @@
 use canvas_api::*;
-use canvas_oauth::connect;
+use canvas_auth::connect;
 
 #[tokio::main]
 async fn main() {

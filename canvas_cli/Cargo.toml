@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 canvas_api = { path = "../canvas_api" }
-canvas_oauth = { path = "../canvas_oauth" }
+canvas_auth = { path = "../canvas_auth" }
 chrono = { version = "0.4.34", features = ["serde"] }
 clap = { version = "4.5.0", features = ["derive"] }
 inquire = "0.6.2"
