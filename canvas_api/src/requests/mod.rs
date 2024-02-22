@@ -29,9 +29,11 @@ pub fn create_client(auth_token: &str) -> Result<Client> {
 }
 
 mod assignment;
+mod course;
 mod todo;
 mod user;
 
 pub use assignment::*;
+pub use course::*;
 pub use todo::*;
 pub use user::*;
