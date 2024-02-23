@@ -4,18 +4,25 @@
 
 ## v1.0 Roadmap
 
-- [ ] Assignments sub-command
-  - [ ] list
-  - [ ] view
-  - [ ] attach
-  - [ ] text-attach
-  - [ ] submit
-- [ ] TODO sub-command
-- [ ] Classes sub-command
-  - [ ] list
-  - [ ] people
-  - [ ] assignments
-  - [ ] discussions
-    - [ ] view
-    - [ ] comments
-      - [ ] editing comments
+Root Level
+
+- [ ] List Courses (Include grade?)
+- [ ] List Todo
+- [ ] List Inbox
+
+Courses Commands
+
+- [ ] List Todo
+- [ ] List Discussions
+- [ ] List Grades (Only graded submissions?)
+- [ ] List Assignments
+- [ ] List Modules
+
+- [ ] View a Todo Item (Assignment)
+- [ ] View a Discussion
+- [ ] View a Submission
+- [ ] View an Assignment
+
+- [ ] Ignore a Todo Item
+
+- [ ] Resolve Pagination
