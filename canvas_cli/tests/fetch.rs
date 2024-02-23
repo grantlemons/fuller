@@ -25,6 +25,7 @@ async fn test_todo() -> anyhow::Result<()> {
 
     let todo = canvas_api::requests::get_todo(client).await;
     assert!(todo.is_ok());
+    assert!(todo?.iter().map(|todo| todo.html_url.clone()).all_unique());
 
     Ok(())
 }
@@ -39,6 +40,7 @@ async fn test_course_list() -> anyhow::Result<()> {
 
     let courses = canvas_api::requests::get_courses(client).await;
     assert!(courses.is_ok());
+    assert!(courses?.iter().map(|course| course.id).all_unique());
 
     Ok(())
 }
@@ -54,7 +56,6 @@ async fn test_course_assignments() -> anyhow::Result<()> {
     let courses = canvas_api::requests::get_courses(client.clone()).await;
     assert!(courses.is_ok());
     let courses = courses.context("Unable to fetch courses list")?;
-    assert!(courses.iter().map(|course| course.id).all_unique());
 
     {
         let client = &client;
