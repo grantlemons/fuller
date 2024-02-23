@@ -31,6 +31,12 @@ pub struct Submission {
 
 impl crate::types::ResponseType for Submission {}
 
+impl std::cmp::PartialEq for Submission {
+    fn eq(&self, other: &Self) -> bool {
+        self.assignment_id == other.assignment_id && self.attempt == other.attempt
+    }
+}
+
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum SubmissionType {
@@ -40,10 +46,11 @@ pub enum SubmissionType {
     None,
     ExternalTool,
     OnlineTextEntry,
-    OnlineURL,
+    OnlineUrl,
     OnlineUpload,
     MediaRecording,
     StudentAnnotation,
+    NotGraded,
 }
 
 #[derive(Debug, Deserialize)]

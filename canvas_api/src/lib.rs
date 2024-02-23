@@ -1,5 +1,8 @@
 pub mod types {
-    pub(crate) trait ResponseType: std::fmt::Debug + serde::de::DeserializeOwned {}
+    pub(crate) trait ResponseType:
+        std::fmt::Debug + std::cmp::PartialEq + serde::de::DeserializeOwned
+    {
+    }
     impl<T: ResponseType> ResponseType for Vec<T> {}
 
     mod assignment;

@@ -27,7 +27,7 @@ pub async fn get_assignment(
     .await
 }
 
-pub async fn list_assignments(client: Client, course_id: u64) -> Result<Vec<Assignment>> {
+pub async fn list_course_assignments(client: Client, course_id: u64) -> Result<Vec<Assignment>> {
     super::get_generic(
         client,
         &format!("/api/v1/courses/{course_id}/assignments"),

@@ -7,7 +7,8 @@ pub struct Todo {
     pub course_id: u64,
     pub context_name: String,
     // pub todo_type: TodoType,
-    pub assignment: Assignment,
+    pub assignment: Option<Assignment>,
+    // pub quiz: Option<Quiz>,
     #[serde(alias = "ignore")]
     pub ignore_url: String,
     #[serde(alias = "ignore_permanently")]
@@ -18,6 +19,15 @@ pub struct Todo {
 }
 
 impl crate::types::ResponseType for Todo {}
+impl std::cmp::PartialEq for Todo {
+    fn eq(&self, other: &Self) -> bool {
+        if let (Some(a1), Some(a2)) = (&self.assignment, &other.assignment) {
+            a1 == a2
+        } else {
+            false
+        }
+    }
+}
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "snake_case")]

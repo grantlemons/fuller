@@ -6,16 +6,16 @@ use serde::Deserialize;
 pub struct Assignment {
     pub id: u64,
     pub name: String,
-    pub description: String,
+    pub description: Option<String>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
-    pub due_at: DateTime<Utc>,
+    pub due_at: Option<DateTime<Utc>>,
     pub lock_at: Option<DateTime<Utc>>,
     pub unlock_at: Option<DateTime<Utc>>,
     // pub all_dates: Option<()>,
     pub course_id: u64,
     pub html_url: String,
-    pub submissions_download_url: String,
+    pub submissions_download_url: Option<String>,
     pub assignment_group_id: u64,
     pub allowed_extensions: Option<Vec<String>>,
     pub max_name_length: u64,
@@ -32,13 +32,13 @@ pub struct Assignment {
     pub group_category_id: Option<u64>,
     pub position: u64,
     // pub post_to_sis: bool,
-    pub points_possible: f32,
+    pub points_possible: Option<f32>,
     pub submission_types: Vec<SubmissionType>,
     pub has_submitted_submissions: bool,
     pub grading_type: GradingType,
     // pub only_visible_to_overrides: bool,
     pub locked_for_user: bool,
-    pub lock_info: Option<String>,
+    // pub lock_info: Option<>, // is seperate object
     pub lock_explanation: Option<String>,
     pub discussion_topic: Option<String>,
     // pub overrides: (),
@@ -58,6 +58,12 @@ pub struct Assignment {
 
 impl crate::types::ResponseType for Assignment {}
 
+impl std::cmp::PartialEq for Assignment {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum GradingType {
@@ -66,4 +72,5 @@ pub enum GradingType {
     LetterGrade,
     GpaScale,
     Points,
+    NotGraded,
 }

@@ -15,3 +15,9 @@ pub struct Profile {
 }
 
 impl crate::types::ResponseType for Profile {}
+
+impl std::cmp::PartialEq for Profile {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
