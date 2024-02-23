@@ -66,7 +66,9 @@ async fn test_course_assignments() -> anyhow::Result<()> {
             })
             .collect_vec();
         for task in list_tasks {
-            assert!(task.await.is_ok());
+            let assignments = task.await;
+            assert!(assignments.is_ok());
+            assert!(assignments?.iter().map(|course| course.id).all_unique());
         }
     }
 
