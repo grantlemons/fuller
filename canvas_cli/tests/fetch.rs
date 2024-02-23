@@ -53,18 +53,19 @@ async fn test_course_assignments() -> anyhow::Result<()> {
 
     let courses = canvas_api::requests::get_courses(client.clone()).await;
     assert!(courses.is_ok());
+    let courses = courses.context("Unable to fetch courses list")?;
+    assert!(courses.iter().map(|course| course.id).all_unique());
 
     {
         let client = &client;
-        let tasks = courses
-            .context("Unable to fetch courses list!")?
-            .into_iter()
+        let list_tasks = courses
+            .iter()
             .map(|course| course.id)
             .map(|course_id| async move {
                 canvas_api::requests::list_course_assignments(client.clone(), course_id).await
             })
             .collect_vec();
-        for task in tasks {
+        for task in list_tasks {
             assert!(task.await.is_ok());
         }
     }
