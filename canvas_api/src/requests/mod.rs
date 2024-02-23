@@ -15,7 +15,16 @@ async fn get_generic<T: crate::types::ResponseType>(
         Some(q) => request.query(q).send().await?,
         None => request.send().await?,
     };
-    response.json::<T>().await
+    let body = response.text().await?;
+    let untyped: serde_json::Value = serde_json::from_str(&body).unwrap();
+    match serde_json::from_str(&body) {
+        Ok(v) => Ok(v),
+        Err(e) => {
+            println!("{:#?}", untyped);
+            panic!("{:#?}", e);
+        }
+    }
+    // response.json::<T>().await
 }
 
 pub fn create_client(auth_token: &str) -> Result<Client> {

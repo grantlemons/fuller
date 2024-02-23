@@ -20,6 +20,7 @@ pub struct Todo {
 impl crate::types::ResponseType for Todo {}
 
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum TodoType {
     Submitting,
     Grading,

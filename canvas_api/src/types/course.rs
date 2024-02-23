@@ -8,13 +8,14 @@ pub struct Course {
     pub name: String,
     pub course_code: String,
     pub workflow_state: WorkflowState,
-    pub start_at: DateTime<Utc>,
-    pub end_at: DateTime<Utc>,
+    pub start_at: Option<DateTime<Utc>>,
+    pub end_at: Option<DateTime<Utc>>,
 }
 
 impl crate::types::ResponseType for Course {}
 
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum WorkflowState {
     Unpublished,
     Available,

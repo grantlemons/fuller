@@ -59,15 +59,11 @@ pub struct Assignment {
 impl crate::types::ResponseType for Assignment {}
 
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum GradingType {
-    #[serde(alias = "pass_fail")]
     PassFail,
-    #[serde(alias = "percent")]
     Percent,
-    #[serde(alias = "letter_grade")]
     LetterGrade,
-    #[serde(alias = "gpa_scale")]
     GpaScale,
-    #[serde(alias = "points")]
     Points,
 }
