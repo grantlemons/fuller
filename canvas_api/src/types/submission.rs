@@ -40,10 +40,11 @@ pub enum SubmissionType {
     None,
     ExternalTool,
     OnlineTextEntry,
-    OnlineURL,
+    OnlineUrl,
     OnlineUpload,
     MediaRecording,
     StudentAnnotation,
+    NotGraded,
 }
 
 #[derive(Debug, Deserialize)]
