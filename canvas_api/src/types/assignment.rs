@@ -58,6 +58,12 @@ pub struct Assignment {
 
 impl crate::types::ResponseType for Assignment {}
 
+impl std::cmp::PartialEq for Assignment {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum GradingType {

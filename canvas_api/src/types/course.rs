@@ -14,6 +14,12 @@ pub struct Course {
 
 impl crate::types::ResponseType for Course {}
 
+impl std::cmp::PartialEq for Course {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum WorkflowState {
