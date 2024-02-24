@@ -35,14 +35,14 @@ impl std::cmp::PartialEq for Discussion {
 
 #[derive(Debug, Deserialize)]
 pub struct DiscussionEntry {
-    id: u64,
-    user_id: Option<u64>,
-    user_name: Option<String>,
-    message: Option<String>,
-    read_state: ReadState,
-    create_at: DateTime<Utc>,
+    pub id: u64,
+    pub user_id: Option<u64>,
+    pub user_name: Option<String>,
+    pub message: Option<String>,
+    pub read_state: ReadState,
+    pub create_at: DateTime<Utc>,
     /// The user_id, user_name, and message will not be returned for deleted entries.
-    deleted: bool,
+    pub deleted: bool,
 }
 
 impl crate::types::ResponseType for DiscussionEntry {}

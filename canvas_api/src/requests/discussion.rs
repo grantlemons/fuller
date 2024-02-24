@@ -1,4 +1,4 @@
-use crate::types::Discussion;
+use crate::types::{Discussion, DiscussionEntry};
 use reqwest::{Client, Result};
 
 pub async fn list_course_discussions(client: Client, course_id: u64) -> Result<Vec<Discussion>> {
