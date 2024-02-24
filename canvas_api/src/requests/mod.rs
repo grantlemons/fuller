@@ -37,12 +37,14 @@ pub fn create_client(auth_token: &str) -> Result<Client> {
     ClientBuilder::new().default_headers(headers).build()
 }
 
-mod assignment;
-mod course;
-mod todo;
-mod user;
+pub mod assignment;
+pub mod course;
+pub mod module;
+pub mod todo;
+pub mod user;
 
 pub use assignment::*;
 pub use course::*;
+pub use module::*;
 pub use todo::*;
 pub use user::*;
