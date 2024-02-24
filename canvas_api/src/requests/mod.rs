@@ -15,8 +15,15 @@ async fn get_generic<T: crate::types::ResponseType>(
         Some(q) => request.query(q).send().await?,
         None => request.send().await?,
     };
+    parse_result(response).await
+}
+
+async fn parse_result<T: crate::types::ResponseType>(
+    response: reqwest::Response,
+) -> reqwest::Result<T> {
     let body = response.text().await?;
     let untyped: serde_json::Value = serde_json::from_str(&body).unwrap();
+
     match serde_json::from_str(&body) {
         Ok(v) => Ok(v),
         Err(e) => {
@@ -33,6 +40,18 @@ pub fn create_client(auth_token: &str) -> Result<Client> {
 
     let mut headers = HeaderMap::new();
     headers.insert("Authorization", auth_bearer);
+    headers.insert("per_page", 50.into());
+
+    ClientBuilder::new().default_headers(headers).build()
+}
+
+pub fn create_test_client(auth_token: &str) -> Result<Client> {
+    let mut auth_bearer: HeaderValue = ("Bearer ".to_owned() + auth_token).try_into().unwrap();
+    auth_bearer.set_sensitive(true);
+
+    let mut headers = HeaderMap::new();
+    headers.insert("Authorization", auth_bearer);
+    headers.insert("per_page", 100.into());
 
     ClientBuilder::new().default_headers(headers).build()
 }

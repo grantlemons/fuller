@@ -7,7 +7,7 @@ async fn test_self_info() -> anyhow::Result<()> {
         .await
         .context("Fetching Auth Token Failed!")?;
     let client =
-        canvas_api::create_client(auth_token.secret()).context("Creating Client Failed!")?;
+        canvas_api::create_test_client(auth_token.secret()).context("Creating Client Failed!")?;
 
     let profile = canvas_api::requests::get_self(client).await;
     assert!(profile.is_ok());
@@ -21,7 +21,7 @@ async fn test_todo() -> anyhow::Result<()> {
         .await
         .context("Fetching Auth Token Failed!")?;
     let client =
-        canvas_api::create_client(auth_token.secret()).context("Creating Client Failed!")?;
+        canvas_api::create_test_client(auth_token.secret()).context("Creating Client Failed!")?;
 
     let todo = canvas_api::requests::get_todo(client).await;
     assert!(todo.is_ok());
@@ -36,7 +36,7 @@ async fn test_course_list() -> anyhow::Result<()> {
         .await
         .context("Fetching Auth Token Failed!")?;
     let client =
-        canvas_api::create_client(auth_token.secret()).context("Creating Client Failed!")?;
+        canvas_api::create_test_client(auth_token.secret()).context("Creating Client Failed!")?;
 
     let courses = canvas_api::requests::get_courses(client).await;
     assert!(courses.is_ok());
@@ -51,7 +51,7 @@ async fn test_course_assignments() -> anyhow::Result<()> {
         .await
         .context("Fetching Auth Token Failed!")?;
     let client =
-        canvas_api::create_client(auth_token.secret()).context("Creating Client Failed!")?;
+        canvas_api::create_test_client(auth_token.secret()).context("Creating Client Failed!")?;
 
     let courses = canvas_api::requests::get_courses(client.clone()).await;
     assert!(courses.is_ok());
@@ -62,12 +62,15 @@ async fn test_course_assignments() -> anyhow::Result<()> {
         let list_tasks = courses
             .iter()
             .map(|course| course.id)
-            .map(|course_id| async move {
-                canvas_api::requests::list_course_assignments(client.clone(), course_id).await
+            .map(|course_id| {
+                tokio::spawn(canvas_api::requests::list_course_assignments(
+                    client.clone(),
+                    course_id,
+                ))
             })
             .collect_vec();
         for task in list_tasks {
-            let assignments = task.await;
+            let assignments = task.await.unwrap();
             assert!(assignments.is_ok());
             assert!(assignments?.iter().map(|course| course.id).all_unique());
         }
@@ -82,7 +85,7 @@ pub async fn test_modules_list() -> anyhow::Result<()> {
         .await
         .context("Fetching Auth Token Failed!")?;
     let client =
-        canvas_api::create_client(auth_token.secret()).context("Creating Client Failed!")?;
+        canvas_api::create_test_client(auth_token.secret()).context("Creating Client Failed!")?;
 
     let courses = canvas_api::requests::get_courses(client.clone()).await;
     assert!(courses.is_ok());
@@ -93,12 +96,15 @@ pub async fn test_modules_list() -> anyhow::Result<()> {
         let list_tasks = courses
             .iter()
             .map(|course| course.id)
-            .map(|course_id| async move {
-                canvas_api::requests::list_course_modules(client.clone(), course_id).await
+            .map(|course_id| {
+                tokio::spawn(canvas_api::requests::list_course_modules(
+                    client.clone(),
+                    course_id,
+                ))
             })
             .collect_vec();
         for task in list_tasks {
-            let modules = task.await;
+            let modules = task.await.unwrap();
             assert!(modules.is_ok());
             assert!(modules?.iter().map(|module| module.id).all_unique());
         }
@@ -113,7 +119,7 @@ pub async fn test_modules_items_list() -> anyhow::Result<()> {
         .await
         .context("Fetching Auth Token Failed!")?;
     let client =
-        canvas_api::create_client(auth_token.secret()).context("Creating Client Failed!")?;
+        canvas_api::create_test_client(auth_token.secret()).context("Creating Client Failed!")?;
 
     let courses = canvas_api::requests::get_courses(client.clone()).await;
     assert!(courses.is_ok());
@@ -124,31 +130,21 @@ pub async fn test_modules_items_list() -> anyhow::Result<()> {
         let list_modules_tasks = courses
             .iter()
             .map(|course| course.id)
-            .map(|course_id| async move {
-                canvas_api::requests::list_course_modules(client.clone(), course_id)
-                    .await
-                    .unwrap()
-                    .iter()
-                    .map(|module| module.id)
-                    .map(|module_id| async move {
-                        canvas_api::requests::list_course_module_items(
-                            client.clone(),
-                            course_id,
-                            module_id,
-                        )
-                        .await
-                    })
-                    .collect_vec()
+            .map(|course_id| {
+                tokio::spawn(canvas_api::requests::list_course_modules_with_items(
+                    client.clone(),
+                    course_id,
+                ))
             })
             .collect_vec();
         for task in list_modules_tasks {
-            let item_tasks = task.await;
-
-            for task in item_tasks {
-                let items = task.await;
-                assert!(items.is_ok());
-                assert!(items?.iter().map(|item| item.id).all_unique());
-            }
+            let modules = task.await.unwrap();
+            assert!(modules.is_ok());
+            let items = modules?
+                .into_iter()
+                .flat_map(|module| module.items)
+                .flatten();
+            assert!(items.map(|item| item.id).all_unique());
         }
     }
 
