@@ -4,7 +4,7 @@ use serde::Deserialize;
 #[derive(Debug, Deserialize)]
 pub struct Module {
     pub id: u64,
-    pub workflow_state: ModuleWorkflowState,
+    // pub workflow_state: ModuleWorkflowState,
     pub position: u64, // 1 based
     pub name: String,
     pub unlock_at: Option<DateTime<Utc>>,
@@ -30,8 +30,8 @@ pub struct ModuleItem {
     pub indent: u64, // unsure if should be represented
     #[serde(alias = "type")]
     pub content_type: ModuleItemType,
-    pub content_id: u64,
-    pub html_url: String,
+    pub content_id: Option<u64>,
+    pub html_url: Option<String>,
 }
 
 impl crate::types::ResponseType for ModuleItem {}
