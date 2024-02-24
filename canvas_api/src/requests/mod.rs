@@ -58,12 +58,14 @@ pub fn create_test_client(auth_token: &str) -> Result<Client> {
 
 pub mod assignment;
 pub mod course;
+pub mod discussion;
 pub mod module;
 pub mod todo;
 pub mod user;
 
 pub use assignment::*;
 pub use course::*;
+pub use discussion::*;
 pub use module::*;
 pub use todo::*;
 pub use user::*;

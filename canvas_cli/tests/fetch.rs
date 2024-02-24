@@ -150,3 +150,40 @@ pub async fn test_modules_items_list() -> anyhow::Result<()> {
 
     Ok(())
 }
+
+#[tokio::test]
+pub async fn test_discussions_list() -> anyhow::Result<()> {
+    let auth_token = canvas_auth::connect()
+        .await
+        .context("Fetching Auth Token Failed!")?;
+    let client =
+        canvas_api::create_test_client(auth_token.secret()).context("Creating Client Failed!")?;
+
+    let courses = canvas_api::requests::get_courses(client.clone()).await;
+    assert!(courses.is_ok());
+    let courses = courses.context("Unable to fetch courses list")?;
+
+    {
+        let client = &client;
+        let list_tasks = courses
+            .iter()
+            .map(|course| course.id)
+            .map(|course_id| {
+                tokio::spawn(canvas_api::requests::list_course_discussions(
+                    client.clone(),
+                    course_id,
+                ))
+            })
+            .collect_vec();
+        for task in list_tasks {
+            let discussions = task.await.unwrap();
+            assert!(discussions.is_ok());
+            assert!(discussions?
+                .iter()
+                .map(|discussion| discussion.id)
+                .all_unique());
+        }
+    }
+
+    Ok(())
+}

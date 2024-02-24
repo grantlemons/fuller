@@ -7,6 +7,7 @@ pub mod types {
 
     mod assignment;
     mod course;
+    mod discussion;
     mod module;
     mod profile;
     mod submission;
@@ -14,6 +15,7 @@ pub mod types {
 
     pub use assignment::*;
     pub use course::*;
+    pub use discussion::*;
     pub use module::*;
     pub use profile::*;
     pub use submission::*;
