@@ -3,7 +3,7 @@ pub struct AccessToken(String);
 
 impl std::fmt::Debug for AccessToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(f, "Secret Access Token")
+        write!(f, "{{Access Token}}")
     }
 }
 

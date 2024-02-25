@@ -1,3 +1,4 @@
+use canvas_auth::AccessToken;
 use reqwest::{
     header::{HeaderMap, HeaderValue},
     Client, ClientBuilder, Result,
@@ -47,13 +48,15 @@ async fn parse_result<T: crate::types::ResponseType>(
 }
 
 #[instrument]
-pub fn create_client(auth_token: &str) -> Result<Client> {
+pub fn create_client(auth_token: AccessToken) -> Result<Client> {
     let pagination = 50;
 
     info!("Building application reqwest client...");
     info!("Default pagination set to {pagination}");
     info!("Setting auth header...");
-    let mut auth_bearer: HeaderValue = ("Bearer ".to_owned() + auth_token).try_into().unwrap();
+    let mut auth_bearer: HeaderValue = ("Bearer ".to_owned() + auth_token.secret())
+        .try_into()
+        .unwrap();
     auth_bearer.set_sensitive(true);
     info!("Auth header set!");
 
@@ -64,13 +67,15 @@ pub fn create_client(auth_token: &str) -> Result<Client> {
     ClientBuilder::new().default_headers(headers).build()
 }
 
-pub fn create_test_client(auth_token: &str) -> Result<Client> {
+pub fn create_test_client(auth_token: AccessToken) -> Result<Client> {
     let pagination = 50;
 
     info!("Building test reqwest client...");
     info!("Default pagination set to {pagination}");
     info!("Setting auth header...");
-    let mut auth_bearer: HeaderValue = ("Bearer ".to_owned() + auth_token).try_into().unwrap();
+    let mut auth_bearer: HeaderValue = ("Bearer ".to_owned() + auth_token.secret())
+        .try_into()
+        .unwrap();
     auth_bearer.set_sensitive(true);
     info!("Auth header set!");
 
