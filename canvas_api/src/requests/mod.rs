@@ -2,52 +2,77 @@ use reqwest::{
     header::{HeaderMap, HeaderValue},
     Client, ClientBuilder, Result,
 };
+use tracing::{info, instrument};
 
 const BASE_URL: &str = "https://elearning.mines.edu";
 
+#[instrument]
 async fn get_generic<T: crate::types::ResponseType>(
     client: reqwest::Client,
     path: &str,
     query: Option<&[(&str, &str)]>,
 ) -> reqwest::Result<T> {
-    let request = client.get(BASE_URL.to_owned() + path);
+    let address = BASE_URL.to_owned() + path;
+    info!("Request address is {address}");
+
+    info!("Making request to server...");
+    let request = client.get(address);
     let response = match query {
         Some(q) => request.query(q).send().await?,
         None => request.send().await?,
     };
+
+    info!("Parsing response!");
     parse_result(response).await
 }
 
+#[instrument]
 async fn parse_result<T: crate::types::ResponseType>(
     response: reqwest::Response,
 ) -> reqwest::Result<T> {
+    info!("Getting body from response...");
     let body = response.text().await?;
     let untyped: serde_json::Value = serde_json::from_str(&body).unwrap();
+    info!("Parsed into untyped JSON");
 
+    info!("Attempting to parse JSON into structured data type...");
     match serde_json::from_str(&body) {
         Ok(v) => Ok(v),
         Err(e) => {
-            println!("{:#?}", untyped);
+            tracing::error!("Unable to parse JSON into structured data type! Panicking!");
+            tracing::error!("{:#?}", untyped);
             panic!("{:#?}", e);
         }
     }
-    // response.json::<T>().await
 }
 
+#[instrument]
 pub fn create_client(auth_token: &str) -> Result<Client> {
+    let pagination = 50;
+
+    info!("Building application reqwest client...");
+    info!("Default pagination set to {pagination}");
+    info!("Setting auth header...");
     let mut auth_bearer: HeaderValue = ("Bearer ".to_owned() + auth_token).try_into().unwrap();
     auth_bearer.set_sensitive(true);
+    info!("Auth header set!");
 
     let mut headers = HeaderMap::new();
     headers.insert("Authorization", auth_bearer);
-    headers.insert("per_page", 50.into());
+    headers.insert("per_page", pagination.into());
 
     ClientBuilder::new().default_headers(headers).build()
 }
 
 pub fn create_test_client(auth_token: &str) -> Result<Client> {
+    let pagination = 50;
+
+    info!("Building test reqwest client...");
+    info!("Default pagination set to {pagination}");
+    info!("Setting auth header...");
     let mut auth_bearer: HeaderValue = ("Bearer ".to_owned() + auth_token).try_into().unwrap();
     auth_bearer.set_sensitive(true);
+    info!("Auth header set!");
 
     let mut headers = HeaderMap::new();
     headers.insert("Authorization", auth_bearer);
