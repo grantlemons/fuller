@@ -1,4 +1,5 @@
 use anyhow::Context;
+use std::{fs::File, sync::Mutex};
 use tracing::Level;
 use tracing_subscriber::FmtSubscriber;
 
@@ -15,8 +16,10 @@ async fn main() -> anyhow::Result<()> {
 }
 
 fn setup_logging() -> anyhow::Result<()> {
+    let log_file = File::create("most-recent.log")?;
     let subscriber = FmtSubscriber::builder()
         .with_max_level(Level::TRACE)
+        .with_writer(Mutex::new(log_file))
         .pretty()
         .finish();
     tracing::subscriber::set_global_default(subscriber)
