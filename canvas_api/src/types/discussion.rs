@@ -34,6 +34,26 @@ impl std::cmp::PartialEq for Discussion {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct DiscussionEntry {
+    pub id: u64,
+    pub user_id: Option<u64>,
+    pub user_name: Option<String>,
+    pub message: Option<String>,
+    pub read_state: ReadState,
+    pub create_at: DateTime<Utc>,
+    /// The user_id, user_name, and message will not be returned for deleted entries.
+    pub deleted: bool,
+}
+
+impl crate::types::ResponseType for DiscussionEntry {}
+
+impl std::cmp::PartialEq for DiscussionEntry {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+#[derive(Debug, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ReadState {
     Read,
