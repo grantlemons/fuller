@@ -9,6 +9,7 @@ use oauth2::{
     EmptyExtraTokenFields, PkceCodeChallenge, PkceCodeVerifier, RedirectUrl, Scope,
     StandardTokenResponse, TokenResponse, TokenUrl,
 };
+use tracing::info;
 
 fn create_client() -> Result<BasicClient, ParseError> {
     let client_id = ClientId::new("".to_owned());
@@ -59,10 +60,12 @@ async fn get_token(
     }
 }
 
+#[tracing::instrument]
 pub async fn connect() -> Result<AccessToken, AuthError> {
     let client = create_client()?;
     let (challenge, verifier) = generate_pkce();
     let redirect_url = generate_redirect_url(&client, challenge);
+    info!("Issuing redirect url: {}", redirect_url);
     println!("Access redirect here: {}", redirect_url);
 
     let response = get_token(&client, verifier).await?;
@@ -71,5 +74,6 @@ pub async fn connect() -> Result<AccessToken, AuthError> {
     let expires_in = response.expires_in();
     let refresh_token = response.refresh_token();
 
+    info!("OAuth2 Auth Proccess Complete!");
     Ok(access_token.to_owned())
 }
