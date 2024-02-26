@@ -5,15 +5,13 @@ use reqwest::{
 };
 use tracing::{info, instrument};
 
-const BASE_URL: &str = "https://elearning.mines.edu";
-
 #[instrument]
 async fn get_generic<T: crate::types::ResponseType>(
     client: reqwest::Client,
     path: &str,
     query: Option<&[(&str, &str)]>,
 ) -> reqwest::Result<T> {
-    let address = BASE_URL.to_owned() + path;
+    let address = std::env::var("CANVAS_URL").unwrap() + path;
     info!("Request address is {address}");
 
     info!("Making request to server...");
