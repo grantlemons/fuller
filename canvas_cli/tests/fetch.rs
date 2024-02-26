@@ -6,8 +6,7 @@ async fn test_self_info() -> anyhow::Result<()> {
     let auth_token = canvas_auth::connect()
         .await
         .context("Fetching Auth Token Failed!")?;
-    let client =
-        canvas_api::create_test_client(auth_token.secret()).context("Creating Client Failed!")?;
+    let client = canvas_api::create_test_client(auth_token).context("Creating Client Failed!")?;
 
     let profile = canvas_api::requests::get_self(client).await;
     assert!(profile.is_ok());
@@ -20,8 +19,7 @@ async fn test_todo() -> anyhow::Result<()> {
     let auth_token = canvas_auth::connect()
         .await
         .context("Fetching Auth Token Failed!")?;
-    let client =
-        canvas_api::create_test_client(auth_token.secret()).context("Creating Client Failed!")?;
+    let client = canvas_api::create_test_client(auth_token).context("Creating Client Failed!")?;
 
     let todo = canvas_api::requests::get_todo(client).await;
     assert!(todo.is_ok());
@@ -35,8 +33,7 @@ async fn test_course_list() -> anyhow::Result<()> {
     let auth_token = canvas_auth::connect()
         .await
         .context("Fetching Auth Token Failed!")?;
-    let client =
-        canvas_api::create_test_client(auth_token.secret()).context("Creating Client Failed!")?;
+    let client = canvas_api::create_test_client(auth_token).context("Creating Client Failed!")?;
 
     let courses = canvas_api::requests::get_courses(client).await;
     assert!(courses.is_ok());
@@ -50,8 +47,7 @@ async fn test_course_assignments() -> anyhow::Result<()> {
     let auth_token = canvas_auth::connect()
         .await
         .context("Fetching Auth Token Failed!")?;
-    let client =
-        canvas_api::create_test_client(auth_token.secret()).context("Creating Client Failed!")?;
+    let client = canvas_api::create_test_client(auth_token).context("Creating Client Failed!")?;
 
     let courses = canvas_api::requests::get_courses(client.clone()).await?;
     let handles = courses.iter().map(|course| course.id).map(|course_id| {
@@ -77,8 +73,7 @@ pub async fn test_modules_list() -> anyhow::Result<()> {
     let auth_token = canvas_auth::connect()
         .await
         .context("Fetching Auth Token Failed!")?;
-    let client =
-        canvas_api::create_test_client(auth_token.secret()).context("Creating Client Failed!")?;
+    let client = canvas_api::create_test_client(auth_token).context("Creating Client Failed!")?;
 
     let courses = canvas_api::requests::get_courses(client.clone()).await?;
     let handles = courses.iter().map(|course| course.id).map(|course_id| {
@@ -101,8 +96,7 @@ pub async fn test_modules_items_list() -> anyhow::Result<()> {
     let auth_token = canvas_auth::connect()
         .await
         .context("Fetching Auth Token Failed!")?;
-    let client =
-        canvas_api::create_test_client(auth_token.secret()).context("Creating Client Failed!")?;
+    let client = canvas_api::create_test_client(auth_token).context("Creating Client Failed!")?;
 
     let courses = canvas_api::requests::get_courses(client.clone()).await?;
     let handles = courses.iter().map(|course| course.id).map(|course_id| {
@@ -130,8 +124,7 @@ pub async fn test_discussions_list() -> anyhow::Result<()> {
     let auth_token = canvas_auth::connect()
         .await
         .context("Fetching Auth Token Failed!")?;
-    let client =
-        canvas_api::create_test_client(auth_token.secret()).context("Creating Client Failed!")?;
+    let client = canvas_api::create_test_client(auth_token).context("Creating Client Failed!")?;
 
     let courses = canvas_api::requests::get_courses(client.clone()).await?;
     let handles = courses.iter().map(|course| course.id).map(|course_id| {
@@ -157,8 +150,7 @@ pub async fn test_discussion_replies_list() -> anyhow::Result<()> {
     let auth_token = canvas_auth::connect()
         .await
         .context("Fetching Auth Token Failed!")?;
-    let client =
-        canvas_api::create_test_client(auth_token.secret()).context("Creating Client Failed!")?;
+    let client = canvas_api::create_test_client(auth_token).context("Creating Client Failed!")?;
 
     let courses = canvas_api::requests::get_courses(client.clone()).await?;
     let client_handles = courses.iter().map(|course| course.id).map(|course_id| {
