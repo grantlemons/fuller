@@ -7,6 +7,12 @@ impl std::fmt::Debug for AccessToken {
     }
 }
 
+impl From<String> for AccessToken {
+    fn from(value: String) -> Self {
+        Self(value)
+    }
+}
+
 impl AccessToken {
     pub fn new<T: ToString>(value: T) -> Self {
         Self(value.to_string())
