@@ -21,6 +21,12 @@ impl std::cmp::PartialEq for Module {
     }
 }
 
+impl std::fmt::Display for Module {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.name)
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct ModuleItem {
     pub id: u64,
@@ -39,6 +45,12 @@ impl crate::types::ResponseType for ModuleItem {}
 impl std::cmp::PartialEq for ModuleItem {
     fn eq(&self, other: &Self) -> bool {
         self.id == other.id
+    }
+}
+
+impl std::fmt::Display for ModuleItem {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.title)
     }
 }
 

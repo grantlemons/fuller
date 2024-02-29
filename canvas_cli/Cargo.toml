@@ -9,12 +9,13 @@ canvas_api = { path = "../canvas_api" }
 canvas_auth = { path = "../canvas_auth" }
 chrono = { version = "0.4.34", features = ["serde"] }
 clap = { version = "4.5.0", features = ["derive"] }
-inquire = "0.6.2"
+inquire = { version = "0.6.2", features = ["editor"] }
 itertools = "0.12.1"
 reqwest = "0.11.24"
 serde = { version = "1.0.196", features = ["serde_derive"] }
 serde_json = "1.0.113"
 termcolor = "1.4.1"
+thiserror = "1.0.57"
 tokio = { version = "1.36.0", features = ["full"] }
 tracing = "0.1.40"
 tracing-subscriber = "0.3.18"

@@ -33,6 +33,12 @@ impl std::cmp::PartialEq for Discussion {
     }
 }
 
+impl std::fmt::Display for Discussion {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.title)
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct DiscussionEntry {
     pub id: u64,
