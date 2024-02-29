@@ -1,7 +1,7 @@
 use anyhow::Context;
 use clap::Parser;
 use std::{fs::File, sync::Mutex};
-use tracing::{info, Level};
+use tracing::{info, warn, Level};
 use tracing_subscriber::FmtSubscriber;
 
 mod cli;
@@ -27,14 +27,16 @@ async fn main() -> anyhow::Result<()> {
 
     match &cli.command {
         cli::Commands::Courses { command: None } => match course_selector(client).await {
-            Err(Error::InputError(_)) => {}
+            Err(Error::InputError(_)) => warn!("Error getting user input! Ignoring."),
             choice => println!("{:#?}", choice?),
         },
         cli::Commands::Todo { command: None } => match todo_selector(client).await {
-            Err(Error::InputError(_)) => {}
+            Err(Error::InputError(_)) => warn!("Error getting user input! Ignoring."),
             choice => println!("{:#?}", choice?),
         },
-        // cli::Commands::Inbox { command: c } => {}
+        cli::Commands::Inbox { command: None } => {
+            todo!("Inbox implemented yet!");
+        }
         cli::Commands::Profile { command: None } => {
             let profile = canvas_api::requests::get_self(client).await?;
             println!("{:#?}", profile);
