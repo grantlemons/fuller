@@ -21,3 +21,9 @@ impl std::cmp::PartialEq for Profile {
         self.id == other.id
     }
 }
+
+impl std::fmt::Display for Profile {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.name)
+    }
+}
