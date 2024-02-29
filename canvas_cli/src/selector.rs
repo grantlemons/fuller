@@ -22,7 +22,7 @@ async fn prompt_selector<T: std::fmt::Display>(
     use inquire::formatter::OptionFormatter;
     use inquire::Select;
 
-    let formatter: OptionFormatter<T> = &|o| format!("[{}], {}", o.index, o.value);
+    let formatter: OptionFormatter<T> = &|o| format!("[{}] {}", o.index, o.value);
     let selection = Select::new("Select Course to View", options)
         .with_formatter(formatter)
         .with_vim_mode(true)
