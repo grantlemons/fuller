@@ -1,25 +1,24 @@
-use anyhow::Context;
 use canvas_api::types::*;
 use reqwest::Client;
 use tracing::info;
 
-pub(crate) async fn course_selector(client: Client) -> anyhow::Result<Course> {
-    let courses = canvas_api::requests::get_courses(client)
-        .await
-        .context("Unable to fetch course list!")?;
+pub(crate) async fn course_selector(client: Client) -> Result<Course, crate::error::Error> {
+    let courses = canvas_api::requests::get_courses(client).await?;
     info!("Fetched course list, prompting user.");
-    prompt_selector(courses).await
+
+    Ok(prompt_selector(courses).await?)
 }
 
-pub(crate) async fn todo_selector(client: Client) -> anyhow::Result<Todo> {
-    let todo = canvas_api::requests::get_todo(client)
-        .await
-        .context("Unable to fetch todo list!")?;
+pub(crate) async fn todo_selector(client: Client) -> Result<Todo, crate::error::Error> {
+    let todo = canvas_api::requests::get_todo(client).await?;
     info!("Fetched todo list, prompting user.");
-    prompt_selector(todo).await
+
+    Ok(prompt_selector(todo).await?)
 }
 
-async fn prompt_selector<T: std::fmt::Display>(options: Vec<T>) -> anyhow::Result<T> {
+async fn prompt_selector<T: std::fmt::Display>(
+    options: Vec<T>,
+) -> inquire::error::InquireResult<T> {
     use inquire::formatter::OptionFormatter;
     use inquire::Select;
 
@@ -28,8 +27,7 @@ async fn prompt_selector<T: std::fmt::Display>(options: Vec<T>) -> anyhow::Resul
         .with_formatter(formatter)
         .with_vim_mode(true)
         .with_page_size(15)
-        .prompt()
-        .unwrap();
+        .prompt()?;
     info!("User made selection: {}", selection);
 
     Ok(selection)

@@ -5,8 +5,10 @@ use tracing::{info, Level};
 use tracing_subscriber::FmtSubscriber;
 
 mod cli;
+mod error;
 mod selector;
 use cli::Cli;
+use error::Error;
 use selector::*;
 
 #[tokio::main]
@@ -15,7 +17,7 @@ async fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
     setup_logging()?;
 
-    if let Some(_) = cli.config {
+    if cli.config.is_some() {
         todo!("Passing a config file is not yet supported!");
     }
 
@@ -24,24 +26,18 @@ async fn main() -> anyhow::Result<()> {
     info!("Created request client!");
 
     match &cli.command {
-        cli::Commands::Courses { command: c } => {
-            if let None = c {
-                let class = course_selector(client).await?;
-                println!("{:#?}", class);
-            }
-        }
-        cli::Commands::Todo { command: c } => {
-            if let None = c {
-                let class = todo_selector(client).await?;
-                println!("{:#?}", class);
-            }
-        }
+        cli::Commands::Courses { command: None } => match course_selector(client).await {
+            Err(Error::InputError(_)) => {}
+            choice => println!("{:#?}", choice?),
+        },
+        cli::Commands::Todo { command: None } => match todo_selector(client).await {
+            Err(Error::InputError(_)) => {}
+            choice => println!("{:#?}", choice?),
+        },
         // cli::Commands::Inbox { command: c } => {}
-        cli::Commands::Profile { command: c } => {
-            if let None = c {
-                let profile = canvas_api::requests::get_self(client).await?;
-                println!("{:#?}", profile);
-            }
+        cli::Commands::Profile { command: None } => {
+            let profile = canvas_api::requests::get_self(client).await?;
+            println!("{:#?}", profile);
         }
         _ => {}
     }
@@ -51,8 +47,7 @@ async fn main() -> anyhow::Result<()> {
 
 async fn auth_token(cli: &Cli) -> anyhow::Result<canvas_auth::AccessToken> {
     if let Some(token) = &cli.token {
-        let auth_token;
-        auth_token = token.clone().into();
+        let auth_token = token.clone().into();
         info!("User provided a token: {:?}", auth_token);
 
         Ok(auth_token)
