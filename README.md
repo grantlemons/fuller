@@ -18,11 +18,17 @@ Courses Commands
 - [ ] List Assignments
 - [ ] List Modules
 
+View Interfaces
+
 - [ ] View a Todo Item (Assignment)
 - [ ] View a Discussion
 - [ ] View a Submission
 - [ ] View an Assignment
 
+Other
+
 - [ ] Ignore a Todo Item
+
+Issues
 
 - [ ] Resolve Pagination
