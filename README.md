@@ -6,9 +6,10 @@
 
 Root Level
 
-- [ ] List Courses (Include grade?)
-- [ ] List Todo
+- [x] List Courses
+- [x] List Todo
 - [ ] List Inbox
+- [ ] Show Profile
 
 Courses Commands
 
