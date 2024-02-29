@@ -5,20 +5,46 @@ use tracing::{info, Level};
 use tracing_subscriber::FmtSubscriber;
 
 mod cli;
+mod selector;
 use cli::Cli;
+use selector::*;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    setup_logging()?;
+    // Parse before logging setup to prevent empty logfile generation for --help call
     let cli = Cli::parse();
+    setup_logging()?;
 
     if let Some(_) = cli.config {
         todo!("Passing a config file is not yet supported!");
     }
 
-    let _client =
+    let client =
         canvas_api::create_client(auth_token(&cli).await?).context("Creating Client Failed!")?;
     info!("Created request client!");
+
+    match &cli.command {
+        cli::Commands::Courses { command: c } => {
+            if let None = c {
+                let class = course_selector(client).await?;
+                println!("{:#?}", class);
+            }
+        }
+        cli::Commands::Todo { command: c } => {
+            if let None = c {
+                let class = todo_selector(client).await?;
+                println!("{:#?}", class);
+            }
+        }
+        // cli::Commands::Inbox { command: c } => {}
+        cli::Commands::Profile { command: c } => {
+            if let None = c {
+                let profile = canvas_api::requests::get_self(client).await?;
+                println!("{:#?}", profile);
+            }
+        }
+        _ => {}
+    }
 
     Ok(())
 }
