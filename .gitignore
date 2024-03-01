@@ -18,8 +18,8 @@ Cargo.lock
 
 /target
 
-# Sensitive data in dotenv
-.env
+# Sensitive data in config
+config.toml
 
 # Logging output
 *.log

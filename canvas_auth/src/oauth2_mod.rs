@@ -56,12 +56,12 @@ async fn get_token(
         .await;
     match res {
         Ok(res) => Ok(res),
-        Err(_) => Err(AuthError::OAuthError),
+        Err(_) => Err(AuthError::OAuthTransaction),
     }
 }
 
 #[tracing::instrument]
-pub async fn connect() -> Result<AccessToken, AuthError> {
+pub async fn connect(_: &canvas_cli_config::Config) -> Result<crate::AccessToken, AuthError> {
     let client = create_client()?;
     let (challenge, verifier) = generate_pkce();
     let redirect_url = generate_redirect_url(&client, challenge);
@@ -75,5 +75,5 @@ pub async fn connect() -> Result<AccessToken, AuthError> {
     let refresh_token = response.refresh_token();
 
     info!("OAuth2 Auth Proccess Complete!");
-    Ok(access_token.to_owned())
+    Ok(access_token.secret().to_owned().into())
 }

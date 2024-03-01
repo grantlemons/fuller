@@ -1,0 +1,12 @@
+# This is an example config file used as an alternative to OAuth2 authentication.
+#
+# During the development process, this method will be used, as OAuth2 requires
+# an adminstrator to create an application id.
+#
+# Copy this file to a file named config.toml under the same directory.
+# Generate a new token under the settings page and paste it below.
+
+[network]
+url = ""
+token = ""
+pagination = 50

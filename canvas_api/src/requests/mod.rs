@@ -1,4 +1,5 @@
 use canvas_auth::AccessToken;
+use canvas_cli_config::Config;
 use reqwest::{
     header::{HeaderMap, HeaderValue},
     Client, ClientBuilder, Result,
@@ -8,10 +9,11 @@ use tracing::{info, instrument};
 #[instrument]
 async fn get_generic<T: crate::types::ResponseType>(
     client: reqwest::Client,
+    config: &Config,
     path: &str,
     query: Option<&[(&str, &str)]>,
 ) -> reqwest::Result<T> {
-    let address = std::env::var("CANVAS_URL").unwrap() + path;
+    let address = config.network.url.to_owned() + path;
     info!("Request address is {address}");
 
     info!("Making request to server...");
@@ -46,11 +48,9 @@ async fn parse_result<T: crate::types::ResponseType>(
 }
 
 #[instrument]
-pub fn create_client(auth_token: AccessToken) -> Result<Client> {
-    let pagination = 50;
-
+pub fn create_client(auth_token: AccessToken, config: &Config) -> Result<Client> {
     info!("Building application reqwest client...");
-    info!("Default pagination set to {pagination}");
+    info!("Default pagination set to {}", config.network.pagination);
     info!("Setting auth header...");
     let mut auth_bearer: HeaderValue = ("Bearer ".to_owned() + auth_token.secret())
         .try_into()
@@ -60,26 +60,7 @@ pub fn create_client(auth_token: AccessToken) -> Result<Client> {
 
     let mut headers = HeaderMap::new();
     headers.insert("Authorization", auth_bearer);
-    headers.insert("per_page", pagination.into());
-
-    ClientBuilder::new().default_headers(headers).build()
-}
-
-pub fn create_test_client(auth_token: AccessToken) -> Result<Client> {
-    let pagination = 50;
-
-    info!("Building test reqwest client...");
-    info!("Default pagination set to {pagination}");
-    info!("Setting auth header...");
-    let mut auth_bearer: HeaderValue = ("Bearer ".to_owned() + auth_token.secret())
-        .try_into()
-        .unwrap();
-    auth_bearer.set_sensitive(true);
-    info!("Auth header set!");
-
-    let mut headers = HeaderMap::new();
-    headers.insert("Authorization", auth_bearer);
-    headers.insert("per_page", 100.into());
+    headers.insert("per_page", config.network.pagination.into());
 
     ClientBuilder::new().default_headers(headers).build()
 }

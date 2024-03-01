@@ -1,14 +1,16 @@
 use crate::AccessToken;
 use crate::AuthError;
-use dotenv::dotenv;
+use canvas_cli_config::Config;
 use tracing::info;
 
 #[tracing::instrument]
-pub async fn connect() -> Result<AccessToken, AuthError> {
-    dotenv().ok();
-    let env_token = std::env::var("CANVAS_ACCESS_TOKEN")?.to_owned();
-    let access_token = AccessToken::new(env_token);
+pub async fn connect(config: &Config) -> Result<AccessToken, AuthError> {
+    let token = match &config.network.token {
+        Some(t) => t.to_owned(),
+        None => return Err(AuthError::NullToken),
+    };
+    let access_token = AccessToken::from(token);
 
-    info!("Environment Token Auth Proccess Complete!");
+    info!("Token Auth Proccess Complete!");
     Ok(access_token)
 }

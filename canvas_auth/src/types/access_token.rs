@@ -1,4 +1,4 @@
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, serde::Deserialize, Clone)]
 pub struct AccessToken(String);
 
 impl std::fmt::Debug for AccessToken {
@@ -10,6 +10,18 @@ impl std::fmt::Debug for AccessToken {
 impl From<String> for AccessToken {
     fn from(value: String) -> Self {
         Self(value)
+    }
+}
+
+impl From<canvas_cli_config::AccessToken> for AccessToken {
+    fn from(value: canvas_cli_config::AccessToken) -> Self {
+        Self(value.secret().to_owned())
+    }
+}
+
+impl From<AccessToken> for canvas_cli_config::AccessToken {
+    fn from(value: AccessToken) -> Self {
+        Self::new(value.secret().to_owned())
     }
 }
 

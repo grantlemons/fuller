@@ -7,8 +7,14 @@ pub mod types {
     pub use access_token::AccessToken;
     pub use errors::AuthError;
 }
+use tracing::info;
 pub use types::*;
 
-pub async fn connect() -> Result<AccessToken, AuthError> {
-    crate::token::connect().await
+pub async fn connect(config: &canvas_cli_config::Config) -> Result<AccessToken, AuthError> {
+    if config.network.token.is_some() {
+        crate::token::connect(config).await
+    } else {
+        info!("Token not configured: Attempting OAuth Authorization Process");
+        crate::oauth2_mod::connect(config).await
+    }
 }
