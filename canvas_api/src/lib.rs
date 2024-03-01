@@ -24,4 +24,3 @@ pub mod types {
 
 pub mod requests;
 pub use requests::create_client;
-pub use requests::create_test_client;

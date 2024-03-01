@@ -1,3 +1,4 @@
+use canvas_auth::AccessToken;
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 
@@ -8,7 +9,7 @@ pub struct Cli {
     /// This overrides the default in the configuration.
     /// If neither is set, the OAuth2 process will be used.
     #[arg(long, value_name = "TOKEN")]
-    pub token: Option<String>,
+    pub token: Option<AccessToken>,
 
     /// Sets a custom config file.
     #[arg(long, value_name = "FILE")]
@@ -50,7 +51,9 @@ pub enum Commands {
 pub enum CoursesCommands {}
 
 #[derive(Subcommand)]
-pub enum TodoCommands {}
+pub enum TodoCommands {
+    Ignore,
+}
 
 #[derive(Subcommand)]
 pub enum InboxCommands {}

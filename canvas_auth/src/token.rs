@@ -5,7 +5,11 @@ use tracing::info;
 
 #[tracing::instrument]
 pub async fn connect(config: &Config) -> Result<AccessToken, AuthError> {
-    let access_token = AccessToken::from(config.network.token.to_owned());
+    let token = match &config.network.token {
+        Some(t) => t.to_owned(),
+        None => return Err(AuthError::NullToken),
+    };
+    let access_token = AccessToken::from(token);
 
     info!("Token Auth Proccess Complete!");
     Ok(access_token)

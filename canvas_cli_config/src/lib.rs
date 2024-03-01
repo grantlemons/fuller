@@ -39,15 +39,16 @@ impl AccessToken {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct Config {
     pub network: NetworkConfig,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct NetworkConfig {
     pub url: String,
-    pub token: AccessToken,
+    pub token: Option<AccessToken>,
+    pub pagination: u16,
 }
 
 pub fn get_config(path: Option<PathBuf>) -> Result<Config, ConfigError> {
@@ -56,6 +57,10 @@ pub fn get_config(path: Option<PathBuf>) -> Result<Config, ConfigError> {
         None => PathBuf::from("./config.toml"),
     };
     if !path.is_file() {
+        tracing::error!(
+            "Unable to find config file path in filesystem. {:?} is not a file!",
+            path
+        );
         return Err(ConfigError::InvalidPath);
     }
 

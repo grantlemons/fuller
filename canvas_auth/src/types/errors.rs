@@ -9,4 +9,6 @@ pub enum AuthError {
     OAuthTransactionError,
     #[error("Error fetching token from Config!")]
     ConfigError(#[from] ConfigError),
+    #[error("Null token")]
+    NullToken,
 }

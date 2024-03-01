@@ -5,4 +5,5 @@ members = [
     "canvas_api",
     "canvas_cli",
     "canvas_auth",
+    "canvas_cli_config",
 ]

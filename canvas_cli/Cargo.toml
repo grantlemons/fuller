@@ -7,6 +7,7 @@ edition = "2021"
 anyhow = "1.0.80"
 canvas_api = { path = "../canvas_api" }
 canvas_auth = { path = "../canvas_auth" }
+canvas_cli_config = { path = "../canvas_cli_config" }
 chrono = { version = "0.4.34", features = ["serde"] }
 clap = { version = "4.5.0", features = ["derive"] }
 inquire = { version = "0.6.2", features = ["editor"] }
