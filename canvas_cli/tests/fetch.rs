@@ -1,9 +1,12 @@
 use anyhow::Context;
 use itertools::Itertools;
+use std::path::PathBuf;
+
+const CONFIG_FILE: &str = "../config.toml";
 
 #[tokio::test]
 async fn test_self_info() -> anyhow::Result<()> {
-    let config = canvas_cli_config::get_config(None)?;
+    let config = canvas_cli_config::get_config(Some(PathBuf::from(CONFIG_FILE)))?;
     let auth_token = canvas_auth::connect(&config)
         .await
         .context("Fetching Auth Token Failed!")?;
@@ -18,7 +21,7 @@ async fn test_self_info() -> anyhow::Result<()> {
 
 #[tokio::test]
 async fn test_todo() -> anyhow::Result<()> {
-    let config = canvas_cli_config::get_config(None)?;
+    let config = canvas_cli_config::get_config(Some(PathBuf::from(CONFIG_FILE)))?;
     let auth_token = canvas_auth::connect(&config)
         .await
         .context("Fetching Auth Token Failed!")?;
@@ -37,7 +40,7 @@ async fn test_todo() -> anyhow::Result<()> {
 
 #[tokio::test]
 async fn test_course_list() -> anyhow::Result<()> {
-    let config = canvas_cli_config::get_config(None)?;
+    let config = canvas_cli_config::get_config(Some(PathBuf::from(CONFIG_FILE)))?;
     let auth_token = canvas_auth::connect(&config)
         .await
         .context("Fetching Auth Token Failed!")?;
@@ -53,7 +56,7 @@ async fn test_course_list() -> anyhow::Result<()> {
 
 #[tokio::test]
 async fn test_course_assignments() -> anyhow::Result<()> {
-    let config = canvas_cli_config::get_config(None)?;
+    let config = canvas_cli_config::get_config(Some(PathBuf::from(CONFIG_FILE)))?;
     let auth_token = canvas_auth::connect(&config)
         .await
         .context("Fetching Auth Token Failed!")?;
@@ -82,7 +85,7 @@ async fn test_course_assignments() -> anyhow::Result<()> {
 
 #[tokio::test]
 pub async fn test_modules_list() -> anyhow::Result<()> {
-    let config = canvas_cli_config::get_config(None)?;
+    let config = canvas_cli_config::get_config(Some(PathBuf::from(CONFIG_FILE)))?;
     let auth_token = canvas_auth::connect(&config)
         .await
         .context("Fetching Auth Token Failed!")?;
@@ -108,7 +111,7 @@ pub async fn test_modules_list() -> anyhow::Result<()> {
 
 #[tokio::test]
 pub async fn test_modules_items_list() -> anyhow::Result<()> {
-    let config = canvas_cli_config::get_config(None)?;
+    let config = canvas_cli_config::get_config(Some(PathBuf::from(CONFIG_FILE)))?;
     let auth_token = canvas_auth::connect(&config)
         .await
         .context("Fetching Auth Token Failed!")?;
@@ -139,7 +142,7 @@ pub async fn test_modules_items_list() -> anyhow::Result<()> {
 
 #[tokio::test]
 pub async fn test_discussions_list() -> anyhow::Result<()> {
-    let config = canvas_cli_config::get_config(None)?;
+    let config = canvas_cli_config::get_config(Some(PathBuf::from(CONFIG_FILE)))?;
     let auth_token = canvas_auth::connect(&config)
         .await
         .context("Fetching Auth Token Failed!")?;
@@ -168,7 +171,7 @@ pub async fn test_discussions_list() -> anyhow::Result<()> {
 
 #[tokio::test]
 pub async fn test_discussion_replies_list() -> anyhow::Result<()> {
-    let config = canvas_cli_config::get_config(None)?;
+    let config = canvas_cli_config::get_config(Some(PathBuf::from(CONFIG_FILE)))?;
     let auth_token = canvas_auth::connect(&config)
         .await
         .context("Fetching Auth Token Failed!")?;
