@@ -62,7 +62,7 @@ async fn main() -> anyhow::Result<()> {
 
 async fn auth_token(cli: &Cli, config: &Config) -> anyhow::Result<canvas_auth::AccessToken> {
     if let Some(token) = &cli.token {
-        let auth_token = token.clone().into();
+        let auth_token = token.clone();
         info!("User provided a token: {:?}", auth_token);
 
         Ok(auth_token)

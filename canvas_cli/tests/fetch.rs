@@ -3,12 +3,14 @@ use itertools::Itertools;
 
 #[tokio::test]
 async fn test_self_info() -> anyhow::Result<()> {
-    let auth_token = canvas_auth::connect()
+    let config = canvas_cli_config::get_config(None)?;
+    let auth_token = canvas_auth::connect(&config)
         .await
         .context("Fetching Auth Token Failed!")?;
-    let client = canvas_api::create_test_client(auth_token).context("Creating Client Failed!")?;
+    let client =
+        canvas_api::create_client(auth_token, &config).context("Creating Client Failed!")?;
 
-    let profile = canvas_api::requests::get_self(client).await;
+    let profile = canvas_api::requests::get_self(client, &config).await;
     assert!(profile.is_ok());
 
     Ok(())
@@ -16,26 +18,33 @@ async fn test_self_info() -> anyhow::Result<()> {
 
 #[tokio::test]
 async fn test_todo() -> anyhow::Result<()> {
-    let auth_token = canvas_auth::connect()
+    let config = canvas_cli_config::get_config(None)?;
+    let auth_token = canvas_auth::connect(&config)
         .await
         .context("Fetching Auth Token Failed!")?;
-    let client = canvas_api::create_test_client(auth_token).context("Creating Client Failed!")?;
+    let client =
+        canvas_api::create_client(auth_token, &config).context("Creating Client Failed!")?;
 
-    let todo = canvas_api::requests::get_todo(client).await;
+    let todo = canvas_api::requests::get_todo(client, &config).await;
     assert!(todo.is_ok());
-    assert!(todo?.iter().map(|todo| todo.html_url.clone()).all_unique());
+    assert!(todo?
+        .iter()
+        .map(|todo| todo.html_url.to_owned())
+        .all_unique());
 
     Ok(())
 }
 
 #[tokio::test]
 async fn test_course_list() -> anyhow::Result<()> {
-    let auth_token = canvas_auth::connect()
+    let config = canvas_cli_config::get_config(None)?;
+    let auth_token = canvas_auth::connect(&config)
         .await
         .context("Fetching Auth Token Failed!")?;
-    let client = canvas_api::create_test_client(auth_token).context("Creating Client Failed!")?;
+    let client =
+        canvas_api::create_client(auth_token, &config).context("Creating Client Failed!")?;
 
-    let courses = canvas_api::requests::get_courses(client).await;
+    let courses = canvas_api::requests::get_courses(client, &config).await;
     assert!(courses.is_ok());
     assert!(courses?.iter().map(|course| course.id).all_unique());
 
@@ -44,15 +53,18 @@ async fn test_course_list() -> anyhow::Result<()> {
 
 #[tokio::test]
 async fn test_course_assignments() -> anyhow::Result<()> {
-    let auth_token = canvas_auth::connect()
+    let config = canvas_cli_config::get_config(None)?;
+    let auth_token = canvas_auth::connect(&config)
         .await
         .context("Fetching Auth Token Failed!")?;
-    let client = canvas_api::create_test_client(auth_token).context("Creating Client Failed!")?;
+    let client =
+        canvas_api::create_client(auth_token, &config).context("Creating Client Failed!")?;
 
-    let courses = canvas_api::requests::get_courses(client.clone()).await?;
+    let courses = canvas_api::requests::get_courses(client.to_owned(), &config).await?;
     let handles = courses.iter().map(|course| course.id).map(|course_id| {
         tokio::spawn(canvas_api::requests::list_course_assignments(
-            client.clone(),
+            client.to_owned(),
+            config.to_owned(),
             course_id,
         ))
     });
@@ -70,15 +82,18 @@ async fn test_course_assignments() -> anyhow::Result<()> {
 
 #[tokio::test]
 pub async fn test_modules_list() -> anyhow::Result<()> {
-    let auth_token = canvas_auth::connect()
+    let config = canvas_cli_config::get_config(None)?;
+    let auth_token = canvas_auth::connect(&config)
         .await
         .context("Fetching Auth Token Failed!")?;
-    let client = canvas_api::create_test_client(auth_token).context("Creating Client Failed!")?;
+    let client =
+        canvas_api::create_client(auth_token, &config).context("Creating Client Failed!")?;
 
-    let courses = canvas_api::requests::get_courses(client.clone()).await?;
+    let courses = canvas_api::requests::get_courses(client.to_owned(), &config).await?;
     let handles = courses.iter().map(|course| course.id).map(|course_id| {
         tokio::spawn(canvas_api::requests::list_course_modules(
-            client.clone(),
+            client.to_owned(),
+            config.to_owned(),
             course_id,
         ))
     });
@@ -93,15 +108,18 @@ pub async fn test_modules_list() -> anyhow::Result<()> {
 
 #[tokio::test]
 pub async fn test_modules_items_list() -> anyhow::Result<()> {
-    let auth_token = canvas_auth::connect()
+    let config = canvas_cli_config::get_config(None)?;
+    let auth_token = canvas_auth::connect(&config)
         .await
         .context("Fetching Auth Token Failed!")?;
-    let client = canvas_api::create_test_client(auth_token).context("Creating Client Failed!")?;
+    let client =
+        canvas_api::create_client(auth_token, &config).context("Creating Client Failed!")?;
 
-    let courses = canvas_api::requests::get_courses(client.clone()).await?;
+    let courses = canvas_api::requests::get_courses(client.to_owned(), &config).await?;
     let handles = courses.iter().map(|course| course.id).map(|course_id| {
         tokio::spawn(canvas_api::requests::list_course_modules_with_items(
-            client.clone(),
+            client.to_owned(),
+            config.to_owned(),
             course_id,
         ))
     });
@@ -121,15 +139,18 @@ pub async fn test_modules_items_list() -> anyhow::Result<()> {
 
 #[tokio::test]
 pub async fn test_discussions_list() -> anyhow::Result<()> {
-    let auth_token = canvas_auth::connect()
+    let config = canvas_cli_config::get_config(None)?;
+    let auth_token = canvas_auth::connect(&config)
         .await
         .context("Fetching Auth Token Failed!")?;
-    let client = canvas_api::create_test_client(auth_token).context("Creating Client Failed!")?;
+    let client =
+        canvas_api::create_client(auth_token, &config).context("Creating Client Failed!")?;
 
-    let courses = canvas_api::requests::get_courses(client.clone()).await?;
+    let courses = canvas_api::requests::get_courses(client.to_owned(), &config).await?;
     let handles = courses.iter().map(|course| course.id).map(|course_id| {
         tokio::spawn(canvas_api::requests::list_course_discussions(
-            client.clone(),
+            client.to_owned(),
+            config.to_owned(),
             course_id,
         ))
     });
@@ -147,18 +168,21 @@ pub async fn test_discussions_list() -> anyhow::Result<()> {
 
 #[tokio::test]
 pub async fn test_discussion_replies_list() -> anyhow::Result<()> {
-    let auth_token = canvas_auth::connect()
+    let config = canvas_cli_config::get_config(None)?;
+    let auth_token = canvas_auth::connect(&config)
         .await
         .context("Fetching Auth Token Failed!")?;
-    let client = canvas_api::create_test_client(auth_token).context("Creating Client Failed!")?;
+    let client =
+        canvas_api::create_client(auth_token, &config).context("Creating Client Failed!")?;
 
-    let courses = canvas_api::requests::get_courses(client.clone()).await?;
+    let courses = canvas_api::requests::get_courses(client.to_owned(), &config).await?;
     let client_handles = courses.iter().map(|course| course.id).map(|course_id| {
         (
             course_id,
             tokio::spawn(canvas_api::requests::list_course_discussions(
-                client.clone(),
-                course_id,
+                client.to_owned(),
+                config.to_owned(),
+                course_id.to_owned(),
             )),
         )
     });
@@ -170,7 +194,8 @@ pub async fn test_discussion_replies_list() -> anyhow::Result<()> {
             .map(|discussion| discussion.id)
             .map(|discussion_id| {
                 tokio::spawn(canvas_api::requests::list_course_discussion_replies(
-                    client.clone(),
+                    client.to_owned(),
+                    config.to_owned(),
                     course_id,
                     discussion_id,
                 ))

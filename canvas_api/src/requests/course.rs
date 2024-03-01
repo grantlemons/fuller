@@ -1,13 +1,13 @@
 use crate::types::Course;
 use reqwest::{Client, Result};
 
-pub async fn get_courses(
+pub async fn get_courses<T: std::borrow::Borrow<canvas_cli_config::Config>>(
     client: Client,
-    config: &canvas_cli_config::Config,
+    config: T,
 ) -> Result<Vec<Course>> {
     super::get_generic(
         client,
-        config,
+        config.borrow(),
         "/api/v1/courses",
         Some(&[("enrollment_state", "active")]),
     )
