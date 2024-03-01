@@ -1,6 +1,6 @@
 use anyhow::Context;
 use canvas_api::requests::ignore_todo;
-use canvas_cli_config::Config;
+use canvas_cli_config::{Config, NetworkConfig};
 use clap::Parser;
 use std::{fs::File, sync::Mutex};
 use tracing::{info, warn, Level};
@@ -18,39 +18,50 @@ async fn main() -> anyhow::Result<()> {
     // Parse before logging setup to prevent empty logfile generation for --help call
     let cli = Cli::parse();
     setup_logging()?;
-    let config = canvas_cli_config::get_config(cli.config.to_owned())?;
 
-    let client = canvas_api::create_client(auth_token(&cli, &config).await?, &config)
-        .context("Creating Client Failed!")?;
+    let config = create_config(&cli)?;
+    let auth_token = canvas_auth::connect(&config)
+        .await
+        .context("Fetching Auth Token Failed!")?;
+    let request_client =
+        canvas_api::create_client(auth_token, &config).context("Creating Client Failed!")?;
     info!("Created request client!");
 
     match &cli.command {
-        cli::Commands::Courses { command: None } => match course_selector(client, &config).await {
+        // called courses command without any further subcommands
+        cli::Commands::Courses { command: None } => {
+            match course_selector(request_client, &config).await {
+                Err(Error::InputError(_)) => warn!("Error getting user input! Ignoring."),
+                Ok(choice) => println!("{:#?}", choice),
+                Err(e) => Err(e)?,
+            }
+        }
+        // called todo command without any further subcommands
+        cli::Commands::Todo { command: None } => match todo_selector(request_client, &config).await
+        {
             Err(Error::InputError(_)) => warn!("Error getting user input! Ignoring."),
             Ok(choice) => println!("{:#?}", choice),
             Err(e) => Err(e)?,
         },
-        cli::Commands::Todo { command: None } => match todo_selector(client, &config).await {
-            Err(Error::InputError(_)) => warn!("Error getting user input! Ignoring."),
-            Ok(choice) => println!("{:#?}", choice),
-            Err(e) => Err(e)?,
-        },
+        // called todo command with the ignore subcommand
         cli::Commands::Todo {
             command: Some(TodoCommands::Ignore),
-        } => match todo_multiselector(client.clone(), &config).await {
+        } => match todo_multiselector(request_client.clone(), &config).await {
             Err(Error::InputError(_)) => warn!("Error getting user input! Ignoring."),
             Ok(choices) => {
                 for choice in choices {
-                    ignore_todo(client.clone(), &config, &choice).await?;
+                    ignore_todo(request_client.clone(), &config, &choice).await?;
                 }
             }
             Err(e) => Err(e)?,
         },
+        // called inbox command without any further subcommands
         cli::Commands::Inbox { command: None } => {
             todo!("Inbox not implemented yet!");
         }
+        // called profile command without any further subcommands
         cli::Commands::Profile { command: None } => {
-            let profile = canvas_api::requests::get_self(client, &config).await?;
+            let profile = canvas_api::requests::get_self(request_client, &config).await?;
             println!("{:#?}", profile);
         }
         _ => {}
@@ -60,17 +71,35 @@ async fn main() -> anyhow::Result<()> {
     Ok(())
 }
 
-async fn auth_token(cli: &Cli, config: &Config) -> anyhow::Result<canvas_auth::AccessToken> {
-    if let Some(token) = &cli.token {
-        let auth_token = token.clone();
-        info!("User provided a token: {:?}", auth_token);
+fn create_config(cli: &Cli) -> Result<Config, Error> {
+    let mut config = match (&cli.no_config, &cli.token, &cli.url, &cli.pagination) {
+        // custom config without file if all cli options set
+        (true, Some(token), Some(url), Some(pagination)) => Config {
+            network: NetworkConfig {
+                token: Some(token.to_owned().into()),
+                url: url.to_owned(),
+                pagination: pagination.to_owned(),
+            },
+        },
+        // otherwise error on no config flag
+        (true, _, _, _) => Err(Error::NeedMoreOptionsError)?,
+        // otherwise use config file
+        _ => canvas_cli_config::get_config(cli.config.to_owned())?,
+    };
 
-        Ok(auth_token)
-    } else {
-        canvas_auth::connect(config)
-            .await
-            .context("Fetching Auth Token Failed!")
+    // overwrite config file individually
+    if let Some(token) = &cli.token {
+        info!("User provided a token: {:?}", token);
+        config.network.token = Some(token.to_owned().into());
     }
+    if let Some(url) = &cli.url {
+        config.network.url = url.to_owned();
+    }
+    if let Some(pagination) = &cli.pagination {
+        config.network.pagination = pagination.to_owned();
+    }
+
+    Ok(config)
 }
 
 fn setup_logging() -> anyhow::Result<()> {

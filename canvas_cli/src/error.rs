@@ -8,4 +8,6 @@ pub(crate) enum Error {
     InputError(#[from] inquire::error::InquireError),
     #[error("Error with Config")]
     ConfigError(#[from] canvas_cli_config::ConfigError),
+    #[error("More options required for no config flag")]
+    NeedMoreOptionsError,
 }

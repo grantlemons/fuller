@@ -11,9 +11,19 @@ pub struct Cli {
     #[arg(long, value_name = "TOKEN")]
     pub token: Option<AccessToken>,
 
+    #[arg(long, value_name = "URL")]
+    pub url: Option<String>,
+
+    #[arg(long)]
+    pub pagination: Option<u16>,
+
     /// Sets a custom config file.
     #[arg(long, value_name = "FILE")]
     pub config: Option<PathBuf>,
+
+    /// Sets a custom config file.
+    #[arg(long)]
+    pub no_config: bool,
 
     #[command(subcommand)]
     pub command: Commands,

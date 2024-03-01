@@ -19,6 +19,12 @@ impl From<canvas_cli_config::AccessToken> for AccessToken {
     }
 }
 
+impl Into<canvas_cli_config::AccessToken> for AccessToken {
+    fn into(self) -> canvas_cli_config::AccessToken {
+        canvas_cli_config::AccessToken::new(self.0)
+    }
+}
+
 impl AccessToken {
     pub fn new<T: ToString>(value: T) -> Self {
         Self(value.to_string())
