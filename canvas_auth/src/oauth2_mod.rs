@@ -56,7 +56,7 @@ async fn get_token(
         .await;
     match res {
         Ok(res) => Ok(res),
-        Err(_) => Err(AuthError::OAuthTransactionError),
+        Err(_) => Err(AuthError::OAuthTransaction),
     }
 }
 

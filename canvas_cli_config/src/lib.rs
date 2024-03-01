@@ -9,9 +9,9 @@ pub enum ConfigError {
     #[error("Path is not a file")]
     InvalidPath,
     #[error("Unable to open file")]
-    FsError(#[from] std::io::Error),
+    Fs(#[from] std::io::Error),
     #[error("Unable to parse file")]
-    ParseError(#[from] toml::de::Error),
+    Parse(#[from] toml::de::Error),
 }
 
 #[derive(serde::Serialize, Deserialize, Clone)]

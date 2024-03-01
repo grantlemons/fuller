@@ -31,7 +31,7 @@ async fn main() -> anyhow::Result<()> {
         // called courses command without any further subcommands
         cli::Commands::Courses { command: None } => {
             match course_selector(request_client, &config).await {
-                Err(Error::InputError(_)) => warn!("Error getting user input! Ignoring."),
+                Err(Error::Input(_)) => warn!("Error getting user input! Ignoring."),
                 Ok(choice) => println!("{:#?}", choice),
                 Err(e) => Err(e)?,
             }
@@ -39,7 +39,7 @@ async fn main() -> anyhow::Result<()> {
         // called todo command without any further subcommands
         cli::Commands::Todo { command: None } => match todo_selector(request_client, &config).await
         {
-            Err(Error::InputError(_)) => warn!("Error getting user input! Ignoring."),
+            Err(Error::Input(_)) => warn!("Error getting user input! Ignoring."),
             Ok(choice) => println!("{:#?}", choice),
             Err(e) => Err(e)?,
         },
@@ -47,7 +47,7 @@ async fn main() -> anyhow::Result<()> {
         cli::Commands::Todo {
             command: Some(TodoCommands::Ignore),
         } => match todo_multiselector(request_client.clone(), &config).await {
-            Err(Error::InputError(_)) => warn!("Error getting user input! Ignoring."),
+            Err(Error::Input(_)) => warn!("Error getting user input! Ignoring."),
             Ok(choices) => {
                 for choice in choices {
                     ignore_todo(request_client.clone(), &config, &choice).await?;
@@ -82,7 +82,7 @@ fn create_config(cli: &Cli) -> Result<Config, Error> {
             },
         },
         // otherwise error on no config flag
-        (true, _, _, _) => Err(Error::NeedMoreOptionsError)?,
+        (true, _, _, _) => Err(Error::NeedMoreOptions)?,
         // otherwise use config file
         _ => canvas_cli_config::get_config(cli.config.to_owned())?,
     };

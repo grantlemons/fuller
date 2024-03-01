@@ -19,9 +19,9 @@ impl From<canvas_cli_config::AccessToken> for AccessToken {
     }
 }
 
-impl Into<canvas_cli_config::AccessToken> for AccessToken {
-    fn into(self) -> canvas_cli_config::AccessToken {
-        canvas_cli_config::AccessToken::new(self.0)
+impl From<AccessToken> for canvas_cli_config::AccessToken {
+    fn from(value: AccessToken) -> Self {
+        Self::new(value.secret().to_owned())
     }
 }
 
