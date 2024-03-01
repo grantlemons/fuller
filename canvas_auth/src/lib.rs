@@ -9,6 +9,6 @@ pub mod types {
 }
 pub use types::*;
 
-pub async fn connect() -> Result<AccessToken, AuthError> {
-    crate::token::connect().await
+pub async fn connect(config: &canvas_cli_config::Config) -> Result<AccessToken, AuthError> {
+    crate::token::connect(config).await
 }

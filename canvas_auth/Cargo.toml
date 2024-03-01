@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-dotenv = "0.15.0"
+canvas_cli_config = { path = "../canvas_cli_config" }
 keyring = "2.3.2"
 oauth2 = "4.4.2"
 serde = "1.0.197"
