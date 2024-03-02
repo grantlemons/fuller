@@ -1,6 +1,5 @@
 use anyhow::Context;
-use canvas_api::requests::ignore_todo;
-use canvas_cli_config::{Config, ConfigIgnore};
+use canvas_cli_config::Config;
 use clap::Parser;
 use std::{fs::File, sync::Mutex};
 use tracing::{info, warn, Level};
@@ -8,10 +7,12 @@ use tracing_subscriber::FmtSubscriber;
 
 mod cli;
 mod error;
+mod handlers;
 mod selector;
+
 use cli::*;
 use error::Error;
-use selector::*;
+use handlers::*;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -28,91 +29,31 @@ async fn main() -> anyhow::Result<()> {
     info!("Created request client!");
 
     match &cli.command {
-        // called courses command without any further subcommands
         cli::Commands::Courses { command: None } => {
-            match prompt_selector(
-                canvas_api::requests::get_courses(request_client, &config)
-                    .await?
-                    .into_iter()
-                    .filter(|c| !config.ignore.courses.contains(&(c.id as i64)))
-                    .collect(),
-            )
-            .await
-            {
-                Err(Error::Input(_)) => warn!("Error getting user input! Ignoring."),
-                Ok(choice) => println!("{:#?}", choice),
-                Err(e) => Err(e)?,
-            }
+            handle_list_courses(request_client, &config).await?
         }
-        // called courses command with the ignore subcommand
+
         cli::Commands::Courses {
             command: Some(CoursesCommands::Ignore),
-        } => match prompt_multiselector(
-            canvas_api::requests::get_courses(request_client, &config)
-                .await?
-                .into_iter()
-                .filter(|c| !config.ignore.courses.contains(&(c.id as i64)))
-                .collect(),
-        )
-        .await
-        {
-            Err(Error::Input(_)) => warn!("Error getting user input! Ignoring."),
-            Ok(choices) => {
-                for choice in choices {
-                    info!("User ignored course {}", choice);
-                    canvas_cli_config::ignore_id(
-                        cli.config.to_owned(),
-                        ConfigIgnore::Course(choice.id as i64),
-                    )?;
-                }
-            }
-            Err(e) => Err(e)?,
-        },
-        // called todo command without any further subcommands
-        cli::Commands::Todo { command: None } => {
-            match prompt_selector(
-                canvas_api::requests::get_todo(request_client.to_owned(), &config).await?,
-            )
-            .await
-            {
-                Err(Error::Input(_)) => warn!("Error getting user input! Ignoring."),
-                Ok(choice) => println!("{:#?}", choice),
-                Err(e) => Err(e)?,
-            }
-        }
-        // called todo command with the ignore subcommand
+        } => ignore_courses(request_client, cli, &config).await?,
+
+        cli::Commands::Todo { command: None } => handle_list_todo(request_client, &config).await?,
+
         cli::Commands::Todo {
             command: Some(TodoCommands::Ignore),
-        } => match prompt_multiselector(
-            canvas_api::requests::get_todo(request_client.to_owned(), &config).await?,
-        )
-        .await
-        {
-            Err(Error::Input(_)) => warn!("Error getting user input! Ignoring."),
-            Ok(choices) => {
-                for choice in choices {
-                    ignore_todo(request_client.to_owned(), &config, &choice).await?;
-                }
-            }
-            Err(e) => Err(e)?,
-        },
-        // called inbox command without any further subcommands
-        cli::Commands::Inbox { command: None } => {
-            todo!("Inbox not implemented yet!");
-        }
-        // called courses command with the ignore subcommand
+        } => handle_ignore_todo(request_client, &config).await?,
+
+        cli::Commands::Inbox { command: None } => todo!("Inbox not implemented yet!"),
+
         cli::Commands::Inbox {
             command: Some(InboxCommands::Ignore),
-        } => {
-            todo!("Inbox not implemented yet!");
-        }
-        // called profile command without any further subcommands
+        } => todo!("Inbox not implemented yet!"),
+
         cli::Commands::Profile { command: None } => {
-            let profile = canvas_api::requests::get_self(request_client, &config).await?;
-            println!("{:#?}", profile);
+            handle_show_profile(request_client, &config).await?
         }
         _ => {}
-    }
+    };
 
     warn!("Program complete, terminating!");
     Ok(())
