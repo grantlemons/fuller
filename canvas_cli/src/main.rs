@@ -59,6 +59,7 @@ async fn main() -> anyhow::Result<()> {
             Err(Error::Input(_)) => warn!("Error getting user input! Ignoring."),
             Ok(choices) => {
                 for choice in choices {
+                    info!("User ignored course {}", choice);
                     canvas_cli_config::ignore_id(
                         cli.config.to_owned(),
                         ConfigIgnore::Course(choice.id as i64),
