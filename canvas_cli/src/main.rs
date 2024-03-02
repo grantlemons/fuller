@@ -1,6 +1,5 @@
 use anyhow::Context;
-use canvas_api::requests::ignore_todo;
-use canvas_cli_config::{Config, NetworkConfig};
+use canvas_cli_config::Config;
 use clap::Parser;
 use std::{fs::File, sync::Mutex};
 use tracing::{info, warn, Level};
@@ -8,10 +7,12 @@ use tracing_subscriber::FmtSubscriber;
 
 mod cli;
 mod error;
+mod handlers;
 mod selector;
+
 use cli::*;
 use error::Error;
-use selector::*;
+use handlers::*;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -28,44 +29,31 @@ async fn main() -> anyhow::Result<()> {
     info!("Created request client!");
 
     match &cli.command {
-        // called courses command without any further subcommands
         cli::Commands::Courses { command: None } => {
-            match course_selector(request_client, &config).await {
-                Err(Error::Input(_)) => warn!("Error getting user input! Ignoring."),
-                Ok(choice) => println!("{:#?}", choice),
-                Err(e) => Err(e)?,
-            }
+            handle_list_courses(request_client, &config).await?
         }
-        // called todo command without any further subcommands
-        cli::Commands::Todo { command: None } => match todo_selector(request_client, &config).await
-        {
-            Err(Error::Input(_)) => warn!("Error getting user input! Ignoring."),
-            Ok(choice) => println!("{:#?}", choice),
-            Err(e) => Err(e)?,
-        },
-        // called todo command with the ignore subcommand
+
+        cli::Commands::Courses {
+            command: Some(CoursesCommands::Ignore),
+        } => ignore_courses(request_client, cli, &config).await?,
+
+        cli::Commands::Todo { command: None } => handle_list_todo(request_client, &config).await?,
+
         cli::Commands::Todo {
             command: Some(TodoCommands::Ignore),
-        } => match todo_multiselector(request_client.clone(), &config).await {
-            Err(Error::Input(_)) => warn!("Error getting user input! Ignoring."),
-            Ok(choices) => {
-                for choice in choices {
-                    ignore_todo(request_client.clone(), &config, &choice).await?;
-                }
-            }
-            Err(e) => Err(e)?,
-        },
-        // called inbox command without any further subcommands
-        cli::Commands::Inbox { command: None } => {
-            todo!("Inbox not implemented yet!");
-        }
-        // called profile command without any further subcommands
+        } => handle_ignore_todo(request_client, &config).await?,
+
+        cli::Commands::Inbox { command: None } => todo!("Inbox not implemented yet!"),
+
+        cli::Commands::Inbox {
+            command: Some(InboxCommands::Ignore),
+        } => todo!("Inbox not implemented yet!"),
+
         cli::Commands::Profile { command: None } => {
-            let profile = canvas_api::requests::get_self(request_client, &config).await?;
-            println!("{:#?}", profile);
+            handle_show_profile(request_client, &config).await?
         }
         _ => {}
-    }
+    };
 
     warn!("Program complete, terminating!");
     Ok(())
@@ -74,13 +62,13 @@ async fn main() -> anyhow::Result<()> {
 fn create_config(cli: &Cli) -> Result<Config, Error> {
     let mut config = match (&cli.no_config, &cli.token, &cli.url, &cli.pagination) {
         // custom config without file if all cli options set
-        (true, Some(token), Some(url), Some(pagination)) => Config {
-            network: NetworkConfig {
-                token: Some(token.to_owned().into()),
-                url: url.to_owned(),
-                pagination: pagination.to_owned(),
-            },
-        },
+        // (true, Some(token), Some(url), Some(pagination)) => Config {
+        //     network: NetworkConfig {
+        //         token: Some(token.to_owned().into()),
+        //         url: url.to_owned(),
+        //         pagination: pagination.to_owned(),
+        //     },
+        // },
         // otherwise error on no config flag
         (true, _, _, _) => Err(Error::NeedMoreOptions)?,
         // otherwise use config file

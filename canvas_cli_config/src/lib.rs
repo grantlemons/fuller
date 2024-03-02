@@ -1,7 +1,8 @@
 use serde::Deserialize;
 use std::fs::File;
-use std::io::Read;
+use std::io::{Read, Write};
 use std::path::PathBuf;
+use std::str::FromStr;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -12,6 +13,10 @@ pub enum ConfigError {
     Fs(#[from] std::io::Error),
     #[error("Unable to parse file")]
     Parse(#[from] toml::de::Error),
+    #[error("Unable to parse file to edit")]
+    EditParse(#[from] toml_edit::TomlError),
+    #[error("Unable to parse edited document to config")]
+    EditFailed(#[from] toml_edit::de::Error),
 }
 
 #[derive(serde::Serialize, Deserialize, Clone)]
@@ -42,6 +47,7 @@ impl AccessToken {
 #[derive(Deserialize, Clone, Debug)]
 pub struct Config {
     pub network: NetworkConfig,
+    pub ignore: IgnoreConfig,
 }
 
 #[derive(Deserialize, Clone, Debug)]
@@ -51,11 +57,83 @@ pub struct NetworkConfig {
     pub pagination: u16,
 }
 
-pub fn get_config(path: Option<PathBuf>) -> Result<Config, ConfigError> {
-    let path = match path {
+#[derive(Deserialize, Clone, Debug)]
+pub struct IgnoreConfig {
+    pub courses: Vec<i64>,
+    pub inbox: Vec<i64>,
+    pub discussions: Vec<i64>,
+    pub grades: Vec<i64>,
+    pub assignments: Vec<i64>,
+    pub modules: Vec<i64>,
+}
+
+#[derive(Debug)]
+pub enum ConfigIgnore {
+    Course(i64),
+    Inbox(i64),
+    Discussion(i64),
+    Grade(i64),
+    Assignment(i64),
+    Module(i64),
+}
+
+pub fn config_path(path: Option<PathBuf>) -> PathBuf {
+    match path {
         Some(p) => p,
         None => PathBuf::from("./config.toml"),
+    }
+}
+
+pub fn ignore_id(path: Option<PathBuf>, change: ConfigIgnore) -> Result<Config, ConfigError> {
+    let path = config_path(path);
+    if !path.is_file() {
+        tracing::error!(
+            "Unable to find config file path in filesystem. {:?} is not a file!",
+            path
+        );
+        return Err(ConfigError::InvalidPath);
+    }
+
+    let mut file = File::open(&path)?;
+    let mut file_contents = String::new();
+    file.read_to_string(&mut file_contents)?;
+
+    let mut doc = toml_edit::Document::from_str(&file_contents)?;
+
+    match change {
+        ConfigIgnore::Course(v) => doc["ignore"]["courses"]
+            .as_array_mut()
+            .expect("ignore.courses does not exist")
+            .push(v),
+        ConfigIgnore::Inbox(v) => doc["ignore"]["inbox"]
+            .as_array_mut()
+            .expect("ignore.inbox does not exist")
+            .push(v),
+        ConfigIgnore::Discussion(v) => doc["ignore"]["discussions"]
+            .as_array_mut()
+            .expect("ignore.discussions does not exist")
+            .push(v),
+        ConfigIgnore::Grade(v) => doc["ignore"]["grades"]
+            .as_array_mut()
+            .expect("ignore.grades does not exist")
+            .push(v),
+        ConfigIgnore::Assignment(v) => doc["ignore"]["assignments"]
+            .as_array_mut()
+            .expect("ignore.assignments does not exist")
+            .push(v),
+        ConfigIgnore::Module(v) => doc["ignore"]["modules"]
+            .as_array_mut()
+            .expect("ignore.modules does not exist")
+            .push(v),
     };
+
+    let bytes = doc.to_string();
+    File::create(&path)?.write_all(bytes.as_bytes())?;
+    Ok(toml_edit::de::from_document::<Config>(doc)?)
+}
+
+pub fn get_config(path: Option<PathBuf>) -> Result<Config, ConfigError> {
+    let path = config_path(path);
     if !path.is_file() {
         tracing::error!(
             "Unable to find config file path in filesystem. {:?} is not a file!",
