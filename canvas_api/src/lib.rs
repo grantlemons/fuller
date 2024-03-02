@@ -5,6 +5,9 @@ pub mod types {
     }
     impl<T: ResponseType> ResponseType for Vec<T> {}
 
+    pub(crate) trait RequestType: std::fmt::Debug + serde::ser::Serialize {}
+    impl<T: RequestType> RequestType for Vec<T> {}
+
     mod assignment;
     mod course;
     mod discussion;

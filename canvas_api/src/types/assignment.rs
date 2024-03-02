@@ -1,4 +1,3 @@
-use super::SubmissionType;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
@@ -33,7 +32,7 @@ pub struct Assignment {
     pub position: u64,
     // pub post_to_sis: bool,
     pub points_possible: Option<f32>,
-    pub submission_types: Vec<SubmissionType>,
+    pub submission_types: Vec<AllowedSubmissionType>,
     pub has_submitted_submissions: bool,
     pub grading_type: GradingType,
     // pub only_visible_to_overrides: bool,
@@ -78,5 +77,21 @@ pub enum GradingType {
     LetterGrade,
     GpaScale,
     Points,
+    NotGraded,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum AllowedSubmissionType {
+    DiscussionTopic,
+    OnlineQuiz,
+    OnPaper,
+    None,
+    ExternalTool,
+    OnlineTextEntry,
+    OnlineUrl,
+    OnlineUpload,
+    MediaRecording,
+    StudentAnnotation,
     NotGraded,
 }
