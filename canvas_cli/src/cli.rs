@@ -58,7 +58,9 @@ pub enum Commands {
 }
 
 #[derive(Subcommand)]
-pub enum CoursesCommands {}
+pub enum CoursesCommands {
+    Ignore,
+}
 
 #[derive(Subcommand)]
 pub enum TodoCommands {
@@ -66,7 +68,9 @@ pub enum TodoCommands {
 }
 
 #[derive(Subcommand)]
-pub enum InboxCommands {}
+pub enum InboxCommands {
+    Ignore,
+}
 
 #[derive(Subcommand)]
 pub enum ProfileCommands {}
