@@ -10,3 +10,11 @@
 url = ""
 token = ""
 pagination = 50
+
+[ignore]
+courses = []
+inbox = []
+discussions = []
+grades = []
+assignments = []
+modules = []
