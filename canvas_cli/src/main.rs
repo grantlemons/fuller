@@ -29,39 +29,56 @@ async fn main() -> anyhow::Result<()> {
     info!("Created request client!");
 
     match &cli.command {
-        cli::Commands::Courses { command: None } => {
+        cli::Commands::Courses {
+            course_id: None,
+            command: None,
+        } => {
             let choice = select_course(request_client, &config).await?;
             println!("{:#?}", choice);
         }
 
         cli::Commands::Courses {
-            command: Some(CoursesCommands::Ignore),
+            course_id: None,
+            command: Some(CoursesCommands::Ignore { course_ids: None }),
         } => ignore_courses(request_client, cli, &config).await?,
 
         cli::Commands::Courses {
-            command: Some(CoursesCommands::Assignments),
+            course_id: None,
+            command:
+                Some(CoursesCommands::Assignments {
+                    assignment_id: None,
+                }),
         } => {
             let choice = select_assignment(request_client, &config).await?;
             println!("{:#?}", choice);
         }
 
         cli::Commands::Courses {
-            command: Some(CoursesCommands::Upload { path }),
+            course_id: None,
+            command: Some(CoursesCommands::Upload { path: Some(path) }),
         } => handle_upload_file(&cli, request_client, &config, path).await?,
 
-        cli::Commands::Todo { command: None } => {
+        cli::Commands::Todo {
+            todo_id: None,
+            command: None,
+        } => {
             let choice = select_todo(request_client, &config).await?;
             println!("{:#?}", choice);
         }
 
         cli::Commands::Todo {
-            command: Some(TodoCommands::Ignore),
+            todo_id: None,
+            command: Some(TodoCommands::Ignore { todo_ids: None }),
         } => handle_ignore_todo(request_client, &config).await?,
 
-        cli::Commands::Inbox { command: None } => todo!("Inbox not implemented yet!"),
+        cli::Commands::Inbox {
+            inbox_id: None,
+            command: None,
+        } => todo!("Inbox not implemented yet!"),
 
         cli::Commands::Inbox {
-            command: Some(InboxCommands::Ignore),
+            inbox_id: None,
+            command: Some(InboxCommands::Ignore { inbox_ids: None }),
         } => todo!("Inbox not implemented yet!"),
 
         cli::Commands::Profile { command: None } => {

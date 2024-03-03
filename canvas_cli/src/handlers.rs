@@ -9,6 +9,7 @@ use canvas_cli_config::associate_submission_file;
 use canvas_cli_config::Config;
 use canvas_cli_config::ConfigIgnore;
 use reqwest::Client;
+use std::path::{Path, PathBuf};
 use tracing::info;
 use tracing::warn;
 
@@ -81,7 +82,7 @@ pub async fn select_assignment(
     Ok(None)
 }
 
-fn uploadable_filter(choice: &Assignment, path: &std::path::PathBuf) -> bool {
+fn uploadable_filter(choice: &Assignment, path: &Path) -> bool {
     !choice.locked_for_user
         && choice
             .submission_types
@@ -103,7 +104,7 @@ pub async fn handle_upload_file(
     cli: &Cli,
     request_client: Client,
     config: &Config,
-    path: &std::path::PathBuf,
+    path: &PathBuf,
 ) -> Result<()> {
     let course_id = match select_course(request_client.clone(), config).await? {
         Some(choice) => choice.id,
