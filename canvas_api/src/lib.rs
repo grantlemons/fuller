@@ -36,5 +36,8 @@ pub mod types {
     pub use responses::*;
 }
 
+pub mod file_upload;
 pub mod requests;
+
+pub use file_upload::*;
 pub use requests::create_client;
