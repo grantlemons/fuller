@@ -1,7 +1,6 @@
-use std::io::Read;
-
-use reqwest::Client;
+use reqwest::{Client, Response, Result};
 use serde::{Deserialize, Serialize};
+use std::io::Read;
 
 #[derive(Serialize)]
 pub struct FileNotifyRequest {
@@ -32,7 +31,7 @@ async fn notify_submission<T: std::borrow::Borrow<canvas_cli_config::Config>>(
     request: FileNotifyRequest,
     course_id: u64,
     assignment_id: u64,
-) -> FileNotifyResponse {
+) -> Result<FileNotifyResponse> {
     client
         .post(format!(
         "{}/api/v1/courses/{course_id}/assignments/{assignment_id}/submissions/comments/self/files",
@@ -40,18 +39,16 @@ async fn notify_submission<T: std::borrow::Borrow<canvas_cli_config::Config>>(
     ))
         .json(&request)
         .send()
-        .await
-        .expect("Request failed")
+        .await?
         .json()
         .await
-        .expect("Unable to Deserialize")
 }
 
-async fn upload_file(
+async fn upload_as_instructed(
     client: Client,
     server_instructions: FileNotifyResponse,
     file: &mut std::fs::File,
-) {
+) -> Result<Response> {
     let mut multipart: reqwest::multipart::Form = reqwest::multipart::Form::new();
     for param in server_instructions.upload_params {
         multipart = match param {
@@ -72,5 +69,35 @@ async fn upload_file(
         .multipart(multipart)
         .send()
         .await
-        .unwrap();
+}
+
+pub async fn upload_to_assignment<T: std::borrow::Borrow<canvas_cli_config::Config>>(
+    client: Client,
+    config: T,
+    path: std::path::PathBuf,
+    course_id: u64,
+    assignment_id: u64,
+) -> Result<Response> {
+    let mut file: std::fs::File = std::fs::File::open(path).unwrap();
+    let metadata = file.metadata().expect("Unable to get file metadata!");
+
+    let request = FileNotifyRequest {
+        name: String::from(""),
+        size: metadata.len(),
+        content_type: None,
+        parent_folder_id: None,
+        parent_folder_path: None,
+        on_duplicate: DuplicateBehavior::Rename,
+    };
+
+    let instructions = notify_submission(
+        client.clone(),
+        config.borrow(),
+        request,
+        course_id,
+        assignment_id,
+    )
+    .await?;
+
+    upload_as_instructed(client.clone(), instructions, &mut file).await
 }
