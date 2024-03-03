@@ -18,10 +18,12 @@ async fn get_generic<T: crate::types::ResponseType>(
 
     info!("Making request to server...");
     let request = client.get(address);
-    let response = match query {
-        Some(q) => request.query(q).send().await?,
-        None => request.send().await?,
-    };
+
+    let mut query = query.unwrap_or_default().to_vec();
+    let pagination = config.network.pagination.to_string();
+    query.push(("per_page", &pagination));
+
+    let response = request.query(&query).send().await?;
 
     info!("Parsing response!");
     parse_result(response).await

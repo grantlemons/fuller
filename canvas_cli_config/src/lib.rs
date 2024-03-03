@@ -132,6 +132,36 @@ pub fn associate_submission_file(
     Ok(toml_edit::de::from_document::<Config>(doc)?)
 }
 
+pub fn dissassociate_submission_files(
+    path: Option<PathBuf>,
+    assignment_id: u64,
+) -> Result<Config, ConfigError> {
+    let path = config_path(path);
+    if !path.is_file() {
+        tracing::error!(
+            "Unable to find config file path in filesystem. {:?} is not a file!",
+            path
+        );
+        return Err(ConfigError::InvalidPath);
+    }
+
+    let mut file = File::open(&path)?;
+    let mut file_contents = String::new();
+    file.read_to_string(&mut file_contents)?;
+
+    let mut doc = toml_edit::Document::from_str(&file_contents)?;
+
+    doc["associations"]["submission_files"]
+        .as_table_mut()
+        .expect("associations.submission_files does not exist")
+        .remove_entry(&assignment_id.to_string())
+        .expect("Unable to remove assignment id from config associations table!");
+
+    let bytes = doc.to_string();
+    File::create(&path)?.write_all(bytes.as_bytes())?;
+    Ok(toml_edit::de::from_document::<Config>(doc)?)
+}
+
 pub fn ignore_id(path: Option<PathBuf>, change: ConfigIgnore) -> Result<Config, ConfigError> {
     let path = config_path(path);
     if !path.is_file() {

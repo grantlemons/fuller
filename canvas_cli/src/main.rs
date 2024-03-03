@@ -40,7 +40,7 @@ async fn main() -> anyhow::Result<()> {
         cli::Commands::Courses {
             course_id: None,
             command: Some(CoursesCommands::Ignore { course_ids: None }),
-        } => ignore_courses(request_client, cli, &config).await?,
+        } => ignore_courses(&cli, request_client, &config).await?,
 
         cli::Commands::Courses {
             course_id: None,
@@ -52,6 +52,14 @@ async fn main() -> anyhow::Result<()> {
             let choice = select_assignment(request_client, &config).await?;
             println!("{:#?}", choice);
         }
+
+        cli::Commands::Courses {
+            course_id: None,
+            command:
+                Some(CoursesCommands::Submit {
+                    assignment_id: None,
+                }),
+        } => handle_submit(&cli, request_client, &config).await?,
 
         cli::Commands::Courses {
             course_id: None,

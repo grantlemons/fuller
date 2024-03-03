@@ -67,6 +67,7 @@ pub enum Commands {
 pub enum CoursesCommands {
     Ignore { course_ids: Option<Vec<u64>> },
     Assignments { assignment_id: Option<u64> },
+    Submit { assignment_id: Option<u64> },
     Upload { path: Option<PathBuf> },
 }
 

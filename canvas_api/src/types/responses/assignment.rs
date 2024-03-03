@@ -96,3 +96,16 @@ pub enum AllowedSubmissionType {
     StudentAnnotation,
     NotGraded,
 }
+
+impl std::fmt::Display for AllowedSubmissionType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let str = match self {
+            AllowedSubmissionType::OnlineTextEntry => "Text Entry",
+            AllowedSubmissionType::OnlineUrl => "Online URL",
+            AllowedSubmissionType::OnlineUpload => "Previously Attached File",
+            _ => "Not Supported!",
+        };
+
+        write!(f, "{}", str)
+    }
+}

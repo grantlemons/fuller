@@ -1,5 +1,6 @@
 use crate::types::{Assignment, Submission, SubmissionRequest};
 use reqwest::{Client, Result};
+use tracing::info;
 
 pub async fn get_submissions<T: std::borrow::Borrow<canvas_cli_config::Config>>(
     client: Client,
@@ -23,14 +24,18 @@ pub async fn submit_assignment<T: std::borrow::Borrow<canvas_cli_config::Config>
     assignment_id: u64,
     submission_request: SubmissionRequest,
 ) -> Result<()> {
-    client
+    let res = client
         .post(&format!(
             "{}/api/v1/courses/{course_id}/assignments/{assignment_id}/submissions",
             config.borrow().network.url
         ))
         .json(&submission_request)
         .send()
+        .await?
+        .json::<serde_json::Value>()
         .await?;
+
+    info!("Submission Result: {:#?}", res);
 
     Ok(())
 }
