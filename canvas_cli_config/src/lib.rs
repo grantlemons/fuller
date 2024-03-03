@@ -70,7 +70,7 @@ pub struct IgnoreConfig {
 
 #[derive(Deserialize, Clone, Debug)]
 pub struct AssociationsConfig {
-    pub submission_files: std::collections::BTreeMap<i64, Vec<i64>>,
+    pub submission_files: std::collections::BTreeMap<String, Vec<i64>>,
 }
 
 #[derive(Debug)]
@@ -95,7 +95,7 @@ pub fn associate_submission_file(
     assignment_id: u64,
     file_id: u64,
 ) -> Result<Config, ConfigError> {
-    use toml_edit::Value;
+    use toml_edit::{Item, Value};
 
     let path = config_path(path);
     if !path.is_file() {
@@ -113,16 +113,16 @@ pub fn associate_submission_file(
     let mut doc = toml_edit::Document::from_str(&file_contents)?;
 
     let table = doc["associations"]["submission_files"]
-        .as_inline_table_mut()
+        .as_table_mut()
         .expect("associations.submission_files does not exist");
 
     let str_rep = assignment_id.to_string();
     match table.get_mut(&str_rep) {
-        Some(Value::Array(v)) => v.push(file_id as i64),
+        Some(Item::Value(Value::Array(v))) => v.push(file_id as i64),
         None => {
             let mut arr = toml_edit::Array::new();
             arr.push(file_id as i64);
-            table.insert(&str_rep, Value::Array(arr));
+            table.insert(&str_rep, Item::Value(Value::Array(arr)));
         }
         _ => {}
     };

@@ -11,8 +11,7 @@ url = ""
 token = ""
 pagination = 50
 
-[associations]
-submission_files = {}
+[associations.submission_files]
 
 [ignore]
 courses = []

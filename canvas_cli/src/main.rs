@@ -109,7 +109,7 @@ fn create_config(cli: &Cli) -> Result<Config, Error> {
 fn setup_logging() -> anyhow::Result<()> {
     let log_file = File::create("most-recent.log")?;
     let subscriber = FmtSubscriber::builder()
-        .with_max_level(Level::DEBUG)
+        .with_max_level(Level::INFO)
         .with_writer(Mutex::new(log_file))
         .pretty()
         .finish();
