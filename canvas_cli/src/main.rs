@@ -47,7 +47,7 @@ async fn main() -> anyhow::Result<()> {
 
         cli::Commands::Courses {
             command: Some(CoursesCommands::Upload { path }),
-        } => handle_upload_file(request_client, &config, path).await?,
+        } => handle_upload_file(&cli, request_client, &config, path).await?,
 
         cli::Commands::Todo { command: None } => {
             let choice = select_todo(request_client, &config).await?;

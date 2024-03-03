@@ -5,6 +5,7 @@ use anyhow::Result;
 use canvas_api::requests::*;
 use canvas_api::types::*;
 use canvas_api::upload_to_assignment;
+use canvas_cli_config::associate_submission_file;
 use canvas_cli_config::Config;
 use canvas_cli_config::ConfigIgnore;
 use reqwest::Client;
@@ -81,6 +82,7 @@ pub async fn select_assignment(
 }
 
 pub async fn handle_upload_file(
+    cli: &Cli,
     request_client: Client,
     config: &Config,
     path: &std::path::PathBuf,
@@ -97,6 +99,7 @@ pub async fn handle_upload_file(
         upload_to_assignment(request_client, config, name, path, course_id, assignment_id).await?;
 
     info!("{:#?}", res);
+    associate_submission_file(cli.config.to_owned(), assignment_id, res.id)?;
 
     Ok(())
 }

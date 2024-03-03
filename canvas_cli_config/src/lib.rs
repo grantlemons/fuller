@@ -48,6 +48,7 @@ impl AccessToken {
 pub struct Config {
     pub network: NetworkConfig,
     pub ignore: IgnoreConfig,
+    pub associations: AssociationsConfig,
 }
 
 #[derive(Deserialize, Clone, Debug)]
@@ -67,6 +68,11 @@ pub struct IgnoreConfig {
     pub modules: Vec<i64>,
 }
 
+#[derive(Deserialize, Clone, Debug)]
+pub struct AssociationsConfig {
+    pub submission_files: std::collections::BTreeMap<i64, Vec<i64>>,
+}
+
 #[derive(Debug)]
 pub enum ConfigIgnore {
     Course(i64),
@@ -82,6 +88,48 @@ pub fn config_path(path: Option<PathBuf>) -> PathBuf {
         Some(p) => p,
         None => PathBuf::from("./config.toml"),
     }
+}
+
+pub fn associate_submission_file(
+    path: Option<PathBuf>,
+    assignment_id: u64,
+    file_id: u64,
+) -> Result<Config, ConfigError> {
+    use toml_edit::Value;
+
+    let path = config_path(path);
+    if !path.is_file() {
+        tracing::error!(
+            "Unable to find config file path in filesystem. {:?} is not a file!",
+            path
+        );
+        return Err(ConfigError::InvalidPath);
+    }
+
+    let mut file = File::open(&path)?;
+    let mut file_contents = String::new();
+    file.read_to_string(&mut file_contents)?;
+
+    let mut doc = toml_edit::Document::from_str(&file_contents)?;
+
+    let table = doc["associations"]["submission_files"]
+        .as_inline_table_mut()
+        .expect("associations.submission_files does not exist");
+
+    let str_rep = assignment_id.to_string();
+    match table.get_mut(&str_rep) {
+        Some(Value::Array(v)) => v.push(file_id as i64),
+        None => {
+            let mut arr = toml_edit::Array::new();
+            arr.push(file_id as i64);
+            table.insert(&str_rep, Value::Array(arr));
+        }
+        _ => {}
+    };
+
+    let bytes = doc.to_string();
+    File::create(&path)?.write_all(bytes.as_bytes())?;
+    Ok(toml_edit::de::from_document::<Config>(doc)?)
 }
 
 pub fn ignore_id(path: Option<PathBuf>, change: ConfigIgnore) -> Result<Config, ConfigError> {
