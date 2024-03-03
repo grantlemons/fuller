@@ -1,3 +1,4 @@
+use super::Discussion;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
@@ -39,7 +40,7 @@ pub struct Assignment {
     pub locked_for_user: bool,
     // pub lock_info: Option<>, // is seperate object
     pub lock_explanation: Option<String>,
-    pub discussion_topic: Option<String>,
+    pub discussion_topic: Option<Discussion>,
     // pub overrides: (),
     pub omit_from_final_grade: Option<bool>,
     // pub grader_count: u64,
@@ -80,7 +81,7 @@ pub enum GradingType {
     NotGraded,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum AllowedSubmissionType {
     DiscussionTopic,
