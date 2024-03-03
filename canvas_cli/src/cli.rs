@@ -60,6 +60,8 @@ pub enum Commands {
 #[derive(Subcommand)]
 pub enum CoursesCommands {
     Ignore,
+    Assignments,
+    Upload { path: PathBuf },
 }
 
 #[derive(Subcommand)]

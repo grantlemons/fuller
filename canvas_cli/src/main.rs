@@ -30,14 +30,29 @@ async fn main() -> anyhow::Result<()> {
 
     match &cli.command {
         cli::Commands::Courses { command: None } => {
-            handle_list_courses(request_client, &config).await?
+            let choice = select_course(request_client, &config).await?;
+            println!("{:#?}", choice);
         }
 
         cli::Commands::Courses {
             command: Some(CoursesCommands::Ignore),
         } => ignore_courses(request_client, cli, &config).await?,
 
-        cli::Commands::Todo { command: None } => handle_list_todo(request_client, &config).await?,
+        cli::Commands::Courses {
+            command: Some(CoursesCommands::Assignments),
+        } => {
+            let choice = select_assignment(request_client, &config).await?;
+            println!("{:#?}", choice);
+        }
+
+        cli::Commands::Courses {
+            command: Some(CoursesCommands::Upload { path }),
+        } => handle_upload_file(request_client, &config, path).await?,
+
+        cli::Commands::Todo { command: None } => {
+            let choice = select_todo(request_client, &config).await?;
+            println!("{:#?}", choice);
+        }
 
         cli::Commands::Todo {
             command: Some(TodoCommands::Ignore),
@@ -52,6 +67,7 @@ async fn main() -> anyhow::Result<()> {
         cli::Commands::Profile { command: None } => {
             handle_show_profile(request_client, &config).await?
         }
+
         _ => {}
     };
 
@@ -93,7 +109,7 @@ fn create_config(cli: &Cli) -> Result<Config, Error> {
 fn setup_logging() -> anyhow::Result<()> {
     let log_file = File::create("most-recent.log")?;
     let subscriber = FmtSubscriber::builder()
-        .with_max_level(Level::TRACE)
+        .with_max_level(Level::DEBUG)
         .with_writer(Mutex::new(log_file))
         .pretty()
         .finish();

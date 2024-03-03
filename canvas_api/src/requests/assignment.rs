@@ -59,7 +59,7 @@ pub async fn list_course_assignments<T: std::borrow::Borrow<canvas_cli_config::C
         client,
         config.borrow(),
         &format!("/api/v1/courses/{course_id}/assignments"),
-        None,
+        Some(&[("order_by", "due_at")]),
     )
     .await
 }
