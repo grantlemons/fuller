@@ -87,14 +87,14 @@ impl Assignment {
             (Some(explanation), true, None) => format!("\nAssignment is Locked!\n{}", explanation),
             (Some(explanation), true, Some(unlock_at)) => {
                 format!(
-                    "\nAssignment is Locked!\n{}\n{}",
-                    explanation,
+                    "\n\nAssignment is Locked!\n{}\nWill unlock at {}",
+                    html2text::from_read(&mut explanation.as_bytes(), 80),
                     DateTime::<Local>::from(unlock_at).format(&crate::datetime_format(config))
                 )
             }
-            (_, true, None) => "\nAssignment is Locked!".to_owned(),
+            (_, true, None) => "\n\nAssignment is Locked!".to_owned(),
             (_, true, Some(unlock_at)) => format!(
-                "\nAssignment is Locked!\n{}",
+                "\n\nAssignment is Locked!\nWill unlock at {}",
                 DateTime::<Local>::from(unlock_at).format(&crate::datetime_format(config))
             ),
             _ => String::default(),
