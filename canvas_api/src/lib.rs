@@ -15,6 +15,10 @@ pub mod types {
         }
         impl<T: ResponseType> ResponseType for Vec<T> {}
 
+        pub trait Viewable {
+            fn view(&self, config: &canvas_cli_config::Config) -> String;
+        }
+
         mod assignment;
         mod conversation;
         mod course;

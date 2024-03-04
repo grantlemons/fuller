@@ -3,6 +3,7 @@ use crate::selector::*;
 use crate::Error;
 use anyhow::Result;
 use canvas_api::requests::*;
+use canvas_api::types::Viewable;
 use canvas_api::types::*;
 use canvas_api::upload_to_assignment;
 use canvas_cli_config::associate_submission_file;

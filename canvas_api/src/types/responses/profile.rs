@@ -28,8 +28,8 @@ impl std::fmt::Display for Profile {
     }
 }
 
-impl Profile {
-    pub fn view(&self, _: &canvas_cli_config::Config) -> String {
+impl super::Viewable for Profile {
+    fn view(&self, _: &canvas_cli_config::Config) -> String {
         let title_string = match self.title.to_owned() {
             Some(title) => format!(" ({title})"),
             None => String::default(),

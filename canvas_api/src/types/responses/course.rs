@@ -26,8 +26,8 @@ impl std::fmt::Display for Course {
     }
 }
 
-impl Course {
-    pub fn view(&self, config: &canvas_cli_config::Config) -> String {
+impl super::Viewable for Course {
+    fn view(&self, config: &canvas_cli_config::Config) -> String {
         let start_at_string = match self.start_at {
             Some(date) => format!(
                 "Started On: {}",

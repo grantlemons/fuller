@@ -1,4 +1,5 @@
 use anyhow::Context;
+use canvas_api::types::Viewable;
 use canvas_cli_config::Config;
 use clap::Parser;
 use std::{fs::File, sync::Mutex};

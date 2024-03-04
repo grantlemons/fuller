@@ -70,8 +70,8 @@ impl std::fmt::Display for Assignment {
     }
 }
 
-impl Assignment {
-    pub fn view(&self, config: &canvas_cli_config::Config) -> String {
+impl super::Viewable for Assignment {
+    fn view(&self, config: &canvas_cli_config::Config) -> String {
         let due_at = match self.due_at {
             Some(date) => format!(
                 "\nDue At: {}",
@@ -187,7 +187,7 @@ impl std::fmt::Display for AllowedSubmissionType {
 
 fn display_vec<T: std::fmt::Display>(vec: Vec<T>) -> String {
     let mut res_str: String;
-    if let Some(initial_value) = vec.get(0) {
+    if let Some(initial_value) = vec.first() {
         res_str = initial_value.to_string();
     } else {
         return String::default();
