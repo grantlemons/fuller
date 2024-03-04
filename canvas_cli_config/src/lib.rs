@@ -46,9 +46,16 @@ impl AccessToken {
 
 #[derive(Deserialize, Clone, Debug)]
 pub struct Config {
+    pub formatting: FormattingConfig,
     pub network: NetworkConfig,
     pub ignore: IgnoreConfig,
     pub associations: AssociationsConfig,
+}
+
+#[derive(Deserialize, Clone, Debug)]
+pub struct FormattingConfig {
+    pub date: String,
+    pub time: String,
 }
 
 #[derive(Deserialize, Clone, Debug)]

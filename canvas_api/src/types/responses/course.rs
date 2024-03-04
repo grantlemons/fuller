@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Local, Utc};
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
@@ -23,6 +23,29 @@ impl std::cmp::PartialEq for Course {
 impl std::fmt::Display for Course {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.name)
+    }
+}
+
+impl Course {
+    pub fn view(&self, config: &canvas_cli_config::Config) -> String {
+        let start_at_string = match self.start_at {
+            Some(date) => format!(
+                "Started On: {}",
+                DateTime::<Local>::from(date).format(&config.formatting.date)
+            ),
+            None => String::default(),
+        };
+        let end_at_string = match self.end_at {
+            Some(date) => format!(
+                "Ends On:    {}",
+                DateTime::<Local>::from(date).format(&config.formatting.date)
+            ),
+            None => String::default(),
+        };
+        format!(
+            "[{}] {}\n{}\n{}", // TODO: Investigate formatting w/ termcolor
+            self.id, self.name, start_at_string, end_at_string
+        )
     }
 }
 
