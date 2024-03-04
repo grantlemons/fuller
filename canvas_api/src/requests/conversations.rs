@@ -24,7 +24,7 @@ pub async fn list_conversations(
     super::get_generic(client, config.borrow(), "/api/v1/conversations", None).await
 }
 
-pub async fn get_unread(client: Client, config: impl Borrow<Config>) -> Result<u64> {
+pub async fn unread_count(client: Client, config: impl Borrow<Config>) -> Result<u64> {
     Ok(client
         .get(&format!(
             "{}/api/v1/conversations/unread_count",
