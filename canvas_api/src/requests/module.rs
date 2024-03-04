@@ -1,9 +1,11 @@
 use crate::types::Module;
+use canvas_cli_config::Config;
 use reqwest::{Client, Result};
+use std::borrow::Borrow;
 
-pub async fn list_course_modules<T: std::borrow::Borrow<canvas_cli_config::Config>>(
+pub async fn list_course_modules(
     client: Client,
-    config: T,
+    config: impl Borrow<Config>,
     course_id: u64,
 ) -> Result<Vec<Module>> {
     super::get_generic(
@@ -15,9 +17,9 @@ pub async fn list_course_modules<T: std::borrow::Borrow<canvas_cli_config::Confi
     .await
 }
 
-pub async fn list_course_modules_with_items<T: std::borrow::Borrow<canvas_cli_config::Config>>(
+pub async fn list_course_modules_with_items(
     client: Client,
-    config: T,
+    config: impl Borrow<Config>,
     course_id: u64,
 ) -> Result<Vec<Module>> {
     super::get_generic(
