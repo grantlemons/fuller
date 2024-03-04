@@ -285,7 +285,8 @@ pub async fn handle_ignore_todo(request_client: Client, config: &Config) -> Resu
 }
 
 pub async fn handle_show_profile(request_client: Client, config: &Config) -> Result<()> {
-    get_self(request_client, config).await?;
+    let choice = get_self(request_client, config).await?;
+    println!("{}", choice.view(config));
 
     Ok(())
 }
