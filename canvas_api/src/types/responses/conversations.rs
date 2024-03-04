@@ -19,6 +19,13 @@ pub struct ConversationOverview {
     pub context_name: String,
 }
 
+impl std::cmp::PartialEq for ConversationOverview {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+impl crate::types::ResponseType for ConversationOverview {}
+
 #[derive(Debug, Deserialize)]
 pub struct Conversation {
     pub id: u64,
@@ -36,6 +43,13 @@ pub struct Conversation {
     pub participants: Vec<ConversationParticipant>,
     pub messages: Vec<ConversationMessage>,
 }
+
+impl std::cmp::PartialEq for Conversation {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+impl crate::types::ResponseType for Conversation {}
 
 #[derive(Debug, Deserialize)]
 pub struct ConversationMessage {
@@ -64,6 +78,13 @@ pub struct ConversationParticipant {
     pub name: String,
     pub full_name: String,
 }
+
+#[derive(Debug, Deserialize, PartialEq)]
+pub struct UnreadCount {
+    pub unread_count: u64,
+}
+
+impl crate::types::ResponseType for UnreadCount {}
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "snake_case")]
