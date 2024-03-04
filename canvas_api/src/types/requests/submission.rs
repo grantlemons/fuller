@@ -11,26 +11,20 @@ pub struct SubmissionRequest {
 pub struct SubSubmissionRequest {
     submission_type: SubmissionRequestType,
     /// OnlineTextEntry only
-    #[serde(skip_serializing_if = "Option::is_none")]
     body: Option<String>,
     /// OnlineUrl
-    #[serde(skip_serializing_if = "Option::is_none")]
     url: Option<String>,
     /// OnlineUpload
-    #[serde(skip_serializing_if = "Option::is_none")]
     file_ids: Option<Vec<u64>>,
     /// MediaRecording
     /// Not Supported!
-    #[serde(skip_serializing_if = "Option::is_none")]
     media_comment_id: Option<String>,
     /// MediaRecording
     /// audio or video
     /// Not Supported!
-    #[serde(skip_serializing_if = "Option::is_none")]
     media_comment_type: Option<String>,
     /// StudentAnnotation
     /// Not Supported!
-    #[serde(skip_serializing_if = "Option::is_none")]
     annotatable_attachment_id: Option<u64>,
 }
 
