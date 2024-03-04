@@ -39,6 +39,16 @@ impl std::fmt::Display for Todo {
     }
 }
 
+impl super::Viewable for Todo {
+    fn view(&self, config: &canvas_cli_config::Config) -> String {
+        if let Some(assignment) = &self.assignment {
+            assignment.view(config)
+        } else {
+            "No Assignment!".to_owned()
+        }
+    }
+}
+
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum TodoType {
