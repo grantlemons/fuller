@@ -33,8 +33,9 @@ async fn main() -> anyhow::Result<()> {
             course_id: None,
             command: None,
         } => {
-            let choice = select_course(request_client, &config).await?;
-            println!("{:#?}", choice);
+            if let Some(choice) = select_course(request_client, &config).await? {
+                println!("{}", choice.view(&config));
+            }
         }
 
         cli::Commands::Courses {

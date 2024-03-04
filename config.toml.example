@@ -6,6 +6,11 @@
 # Copy this file to a file named config.toml under the same directory.
 # Generate a new token under the settings page and paste it below.
 
+[formatting]
+# For date and time formatting, see https://docs.rs/chrono/latest/chrono/format/strftime/index.html
+date = "%F" # YYYY-MM-DD
+time = "%R" # 24h Time
+
 [network]
 url = ""
 token = ""

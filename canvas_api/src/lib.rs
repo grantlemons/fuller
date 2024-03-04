@@ -38,6 +38,11 @@ pub mod types {
     pub use responses::*;
 }
 
+#[allow(unused)]
+fn datetime_format(config: &canvas_cli_config::Config) -> String {
+    format!("{} {}", config.formatting.date, config.formatting.time)
+}
+
 pub mod file_upload;
 pub mod requests;
 

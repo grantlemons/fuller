@@ -21,6 +21,7 @@ Courses Commands
 
 View Interfaces
 
+- [x] View a Course
 - [ ] View a Todo Item (Assignment)
 - [ ] View a Profile
 - [ ] View a Discussion
