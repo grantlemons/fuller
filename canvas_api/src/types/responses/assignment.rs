@@ -79,6 +79,14 @@ impl Assignment {
             ),
             None => String::default(),
         };
+        let allowed_extensions = match self.allowed_extensions.clone() {
+            Some(vec) => {
+                format!("\n\nAllowed Extensions =============================================================
+{}
+================================================================================", display_vec(vec))
+            }
+            None => String::default(),
+        };
         let lock_explanation = match (
             self.lock_explanation.to_owned(),
             self.locked_for_user,
@@ -109,8 +117,19 @@ impl Assignment {
             None => String::default(),
         };
         format!(
-            "[{}] {}\nHTML Link: {}{}{}{}", // TODO: Investigate formatting w/ termcolor
-            self.id, self.name, self.html_url, due_at, lock_explanation, description
+            "[{}] {}
+HTML Link: {}{}{}{}
+Allowed Submission Types =======================================================
+{}
+================================================================================{}", // TODO: Investigate formatting w/ termcolor
+            self.id,
+            self.name,
+            self.html_url,
+            due_at,
+            lock_explanation,
+            description,
+            display_vec(self.submission_types.to_owned()),
+            allowed_extensions,
         )
     }
 }
@@ -126,7 +145,7 @@ pub enum GradingType {
     NotGraded,
 }
 
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum AllowedSubmissionType {
     DiscussionTopic,
@@ -148,9 +167,41 @@ impl std::fmt::Display for AllowedSubmissionType {
             AllowedSubmissionType::OnlineTextEntry => "Text Entry",
             AllowedSubmissionType::OnlineUrl => "Online URL",
             AllowedSubmissionType::OnlineUpload => "Previously Attached File",
-            _ => "Not Supported!",
+            AllowedSubmissionType::DiscussionTopic => "Discussion Topic",
+            AllowedSubmissionType::OnlineQuiz => "Online Quiz (Not Supported!)",
+            AllowedSubmissionType::OnPaper => "On Paper (Not Supported!)",
+            AllowedSubmissionType::None => "No Submission Needed!",
+            AllowedSubmissionType::ExternalTool => "External Tool (Not Supported!)",
+            AllowedSubmissionType::MediaRecording => "Media Recording (Not Supported!)",
+            AllowedSubmissionType::StudentAnnotation => "Student Annotation (Not Supported!)",
+            AllowedSubmissionType::NotGraded => "Assignment Not Graded!",
         };
 
         write!(f, "{}", str)
     }
+}
+
+fn display_vec<T: std::fmt::Display>(vec: Vec<T>) -> String {
+    let mut res_str: String;
+    if let Some(initial_value) = vec.get(0) {
+        res_str = initial_value.to_string();
+    } else {
+        return String::default();
+    }
+
+    let mut line_index = 0;
+    for v in vec[1..].iter() {
+        // newline if 80 chars
+        let new_string = v.to_string();
+        if res_str.len() + new_string.len() + 1 - line_index >= 80 {
+            res_str.push_str(",\n");
+            line_index = res_str.len();
+
+            res_str.push_str(&new_string);
+        } else {
+            res_str.push_str(&format!(", {}", new_string));
+        }
+    }
+
+    res_str
 }
