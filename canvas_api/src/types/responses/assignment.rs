@@ -1,5 +1,5 @@
 use super::Discussion;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Local, Utc};
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
@@ -70,6 +70,74 @@ impl std::fmt::Display for Assignment {
     }
 }
 
+impl Assignment {
+    pub fn view(&self, config: &canvas_cli_config::Config) -> String {
+        let due_at = match self.due_at {
+            Some(date) => format!(
+                "\nDue At: {}",
+                DateTime::<Local>::from(date).format(&crate::datetime_format(config))
+            ),
+            None => String::default(),
+        };
+        let allowed_extensions = match self.allowed_extensions.clone() {
+            Some(vec)
+                if self
+                    .submission_types
+                    .contains(&AllowedSubmissionType::OnlineUpload) =>
+            {
+                format!("\n\nAllowed Extensions =============================================================
+{}
+================================================================================", display_vec(vec))
+            }
+            _ => String::default(),
+        };
+        let lock_explanation = match (
+            self.lock_explanation.to_owned(),
+            self.locked_for_user,
+            self.unlock_at,
+        ) {
+            (Some(explanation), true, None) => format!("\nAssignment is Locked!\n{}", explanation),
+            (Some(explanation), true, Some(unlock_at)) => {
+                format!(
+                    "\n\nAssignment is Locked!\n{}\nWill unlock at {}",
+                    html2text::from_read(&mut explanation.as_bytes(), 80),
+                    DateTime::<Local>::from(unlock_at).format(&crate::datetime_format(config))
+                )
+            }
+            (_, true, None) => "\n\nAssignment is Locked!".to_owned(),
+            (_, true, Some(unlock_at)) => format!(
+                "\n\nAssignment is Locked!\nWill unlock at {}",
+                DateTime::<Local>::from(unlock_at).format(&crate::datetime_format(config))
+            ),
+            _ => String::default(),
+        };
+        let description = match self.description.to_owned() {
+            Some(description) => {
+                format!(
+                    "\n\n{}",
+                    html2text::from_read(&mut description.as_bytes(), 80)
+                )
+            }
+            None => String::default(),
+        };
+        format!(
+            "[{}] {}
+HTML Link: {}{}{}{}
+Allowed Submission Types =======================================================
+{}
+================================================================================{}", // TODO: Investigate formatting w/ termcolor
+            self.id,
+            self.name,
+            self.html_url,
+            due_at,
+            lock_explanation,
+            description,
+            display_vec(self.submission_types.to_owned()),
+            allowed_extensions,
+        )
+    }
+}
+
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum GradingType {
@@ -81,7 +149,7 @@ pub enum GradingType {
     NotGraded,
 }
 
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum AllowedSubmissionType {
     DiscussionTopic,
@@ -103,9 +171,41 @@ impl std::fmt::Display for AllowedSubmissionType {
             AllowedSubmissionType::OnlineTextEntry => "Text Entry",
             AllowedSubmissionType::OnlineUrl => "Online URL",
             AllowedSubmissionType::OnlineUpload => "Previously Attached File",
-            _ => "Not Supported!",
+            AllowedSubmissionType::DiscussionTopic => "Discussion Topic",
+            AllowedSubmissionType::OnlineQuiz => "Online Quiz (Not Supported!)",
+            AllowedSubmissionType::OnPaper => "On Paper (Not Supported!)",
+            AllowedSubmissionType::None => "No Submission Needed!",
+            AllowedSubmissionType::ExternalTool => "External Tool (Not Supported!)",
+            AllowedSubmissionType::MediaRecording => "Media Recording (Not Supported!)",
+            AllowedSubmissionType::StudentAnnotation => "Student Annotation (Not Supported!)",
+            AllowedSubmissionType::NotGraded => "Assignment Not Graded!",
         };
 
         write!(f, "{}", str)
     }
+}
+
+fn display_vec<T: std::fmt::Display>(vec: Vec<T>) -> String {
+    let mut res_str: String;
+    if let Some(initial_value) = vec.get(0) {
+        res_str = initial_value.to_string();
+    } else {
+        return String::default();
+    }
+
+    let mut line_index = 0;
+    for v in vec[1..].iter() {
+        // newline if 80 chars
+        let new_string = v.to_string();
+        if res_str.len() + new_string.len() + 1 - line_index >= 80 {
+            res_str.push_str(",\n");
+            line_index = res_str.len();
+
+            res_str.push_str(&new_string);
+        } else {
+            res_str.push_str(&format!(", {}", new_string));
+        }
+    }
+
+    res_str
 }

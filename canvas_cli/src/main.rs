@@ -50,8 +50,9 @@ async fn main() -> anyhow::Result<()> {
                     assignment_id: None,
                 }),
         } => {
-            let choice = select_assignment(request_client, &config).await?;
-            println!("{:#?}", choice);
+            if let Some(choice) = select_assignment(request_client, &config).await? {
+                println!("{}", choice.view(&config));
+            }
         }
 
         cli::Commands::Courses {
