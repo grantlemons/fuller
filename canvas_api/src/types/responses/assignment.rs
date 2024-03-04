@@ -79,16 +79,31 @@ impl Assignment {
             ),
             None => String::default(),
         };
-        let lock_explanation = match (self.lock_explanation.to_owned(), self.locked_for_user) {
-            (Some(explanation), true) => format!("\nAssignment is Locked!\n{}", explanation),
-            (_, true) => "\nAssignment is Locked!".to_owned(),
+        let lock_explanation = match (
+            self.lock_explanation.to_owned(),
+            self.locked_for_user,
+            self.unlock_at,
+        ) {
+            (Some(explanation), true, None) => format!("\nAssignment is Locked!\n{}", explanation),
+            (Some(explanation), true, Some(unlock_at)) => {
+                format!(
+                    "\nAssignment is Locked!\n{}\n{}",
+                    explanation,
+                    DateTime::<Local>::from(unlock_at).format(&crate::datetime_format(config))
+                )
+            }
+            (_, true, None) => "\nAssignment is Locked!".to_owned(),
+            (_, true, Some(unlock_at)) => format!(
+                "\nAssignment is Locked!\n{}",
+                DateTime::<Local>::from(unlock_at).format(&crate::datetime_format(config))
+            ),
             _ => String::default(),
         };
         let description = match self.description.to_owned() {
             Some(description) => {
                 format!(
                     "\n\n{}",
-                    html2text::from_read(&mut description.as_bytes(), 40)
+                    html2text::from_read(&mut description.as_bytes(), 80)
                 )
             }
             None => String::default(),
