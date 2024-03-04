@@ -80,12 +80,16 @@ impl Assignment {
             None => String::default(),
         };
         let allowed_extensions = match self.allowed_extensions.clone() {
-            Some(vec) => {
+            Some(vec)
+                if self
+                    .submission_types
+                    .contains(&AllowedSubmissionType::OnlineUpload) =>
+            {
                 format!("\n\nAllowed Extensions =============================================================
 {}
 ================================================================================", display_vec(vec))
             }
-            None => String::default(),
+            _ => String::default(),
         };
         let lock_explanation = match (
             self.lock_explanation.to_owned(),
