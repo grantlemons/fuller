@@ -27,3 +27,20 @@ impl std::fmt::Display for Profile {
         write!(f, "{}", self.name)
     }
 }
+
+impl Profile {
+    pub fn view(&self, _: &canvas_cli_config::Config) -> String {
+        let title_string = match self.title.to_owned() {
+            Some(title) => format!(" ({title})"),
+            None => String::default(),
+        };
+        let bio_string = match self.bio.to_owned() {
+            Some(bio) => format!("\n\n{}", bio),
+            None => String::default(),
+        };
+        format!(
+            "[{}] {}{}\nTimezone: {}\nEmail: {}{}", // TODO: Investigate formatting w/ termcolor
+            self.id, self.name, title_string, self.time_zone, self.primary_email, bio_string
+        )
+    }
+}
