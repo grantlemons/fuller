@@ -1,9 +1,11 @@
 use crate::types::{Assignment, Submission, SubmissionRequest};
+use canvas_cli_config::Config;
 use reqwest::{Client, Result};
+use std::borrow::Borrow;
 
-pub async fn get_submissions<T: std::borrow::Borrow<canvas_cli_config::Config>>(
+pub async fn get_submissions(
     client: Client,
-    config: T,
+    config: impl Borrow<Config>,
     course_id: u64,
     assignment_id: u64,
 ) -> Result<Submission> {
@@ -16,9 +18,9 @@ pub async fn get_submissions<T: std::borrow::Borrow<canvas_cli_config::Config>>(
     .await
 }
 
-pub async fn submit_assignment<T: std::borrow::Borrow<canvas_cli_config::Config>>(
+pub async fn submit_assignment(
     client: Client,
-    config: T,
+    config: impl Borrow<Config>,
     course_id: u64,
     assignment_id: u64,
     submission_request: SubmissionRequest,
@@ -35,9 +37,9 @@ pub async fn submit_assignment<T: std::borrow::Borrow<canvas_cli_config::Config>
     Ok(())
 }
 
-pub async fn get_assignment<T: std::borrow::Borrow<canvas_cli_config::Config>>(
+pub async fn get_assignment(
     client: Client,
-    config: T,
+    config: impl Borrow<Config>,
     course_id: u64,
     assignment_id: u64,
 ) -> Result<Assignment> {
@@ -50,9 +52,9 @@ pub async fn get_assignment<T: std::borrow::Borrow<canvas_cli_config::Config>>(
     .await
 }
 
-pub async fn list_course_assignments<T: std::borrow::Borrow<canvas_cli_config::Config>>(
+pub async fn list_course_assignments(
     client: Client,
-    config: T,
+    config: impl Borrow<Config>,
     course_id: u64,
 ) -> Result<Vec<Assignment>> {
     super::get_generic(

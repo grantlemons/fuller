@@ -1,9 +1,11 @@
 use crate::types::Profile;
+use canvas_cli_config::Config;
 use reqwest::{Client, Result};
+use std::borrow::Borrow;
 
-pub async fn get_profile<T: std::borrow::Borrow<canvas_cli_config::Config>>(
+pub async fn get_profile(
     client: Client,
-    config: T,
+    config: impl Borrow<Config>,
     user_id: u64,
 ) -> Result<Profile> {
     super::get_generic(
@@ -15,9 +17,6 @@ pub async fn get_profile<T: std::borrow::Borrow<canvas_cli_config::Config>>(
     .await
 }
 
-pub async fn get_self<T: std::borrow::Borrow<canvas_cli_config::Config>>(
-    client: Client,
-    config: T,
-) -> Result<Profile> {
+pub async fn get_self(client: Client, config: impl Borrow<Config>) -> Result<Profile> {
     super::get_generic(client, config.borrow(), "/api/v1/users/self/profile", None).await
 }

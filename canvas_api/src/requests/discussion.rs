@@ -1,9 +1,11 @@
 use crate::types::{Discussion, DiscussionEntry};
+use canvas_cli_config::Config;
 use reqwest::{Client, Result};
+use std::borrow::Borrow;
 
-pub async fn list_course_discussions<T: std::borrow::Borrow<canvas_cli_config::Config>>(
+pub async fn list_course_discussions(
     client: Client,
-    config: T,
+    config: impl Borrow<Config>,
     course_id: u64,
 ) -> Result<Vec<Discussion>> {
     super::get_generic(
@@ -15,9 +17,9 @@ pub async fn list_course_discussions<T: std::borrow::Borrow<canvas_cli_config::C
     .await
 }
 
-pub async fn list_course_discussion_replies<T: std::borrow::Borrow<canvas_cli_config::Config>>(
+pub async fn list_course_discussion_replies(
     client: Client,
-    config: T,
+    config: impl Borrow<Config>,
     course_id: u64,
     discussion_id: u64,
 ) -> Result<Vec<DiscussionEntry>> {

@@ -1,10 +1,9 @@
 use crate::types::Course;
+use canvas_cli_config::Config;
 use reqwest::{Client, Result};
+use std::borrow::Borrow;
 
-pub async fn get_courses<T: std::borrow::Borrow<canvas_cli_config::Config>>(
-    client: Client,
-    config: T,
-) -> Result<Vec<Course>> {
+pub async fn get_courses(client: Client, config: impl Borrow<Config>) -> Result<Vec<Course>> {
     super::get_generic(
         client,
         config.borrow(),
