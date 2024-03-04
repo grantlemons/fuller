@@ -13,7 +13,7 @@ pub struct Submission {
     pub html_url: String,
     pub preview_url: String,
     pub score: f32,
-    // pub submission_comments: Option<Vec<SubmissionComment>>,
+    pub submission_comments: Option<Vec<SubmissionComment>>,
     pub submission_type: SubmissionType,
     pub submitted_at: DateTime<Utc>,
     pub url: Option<String>,
@@ -24,7 +24,7 @@ pub struct Submission {
     pub assignment_visible: bool,
     pub excused: bool,
     pub missing: bool,
-    // pub late_policy_status: LateStatus,
+    pub late_policy_status: Option<LateStatus>,
     pub points_deducted: f32,
     pub seconds_late: u64,
 }
@@ -46,20 +46,28 @@ impl std::fmt::Display for Submission {
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum SubmissionType {
-    DiscussionTopic,
     OnlineQuiz,
-    OnPaper,
-    None,
-    ExternalTool,
     OnlineTextEntry,
     OnlineUrl,
     OnlineUpload,
     MediaRecording,
     StudentAnnotation,
-    NotGraded,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct SubmissionComment; // TODO: Expand
+pub struct SubmissionComment {
+    pub id: u64,
+    pub author_id: u64,
+    pub author_name: String,
+    pub comment: String,
+    pub created_at: DateTime<Utc>,
+    pub edited_at: Option<DateTime<Utc>>,
+}
 #[derive(Debug, Deserialize)]
-pub struct LateStatus; // TODO: Expand
+#[serde(rename_all = "snake_case")]
+pub enum LateStatus {
+    Late,
+    Missing,
+    Extended,
+    None,
+}

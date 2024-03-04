@@ -34,18 +34,24 @@ pub enum Commands {
     /// Course subcommands
     /// Lists a user's courses by default
     Courses {
+        course_id: Option<u64>,
+
         #[command(subcommand)]
         command: Option<CoursesCommands>,
     },
     /// Todo subcommands
     /// Lists a user's todo list by default
     Todo {
+        todo_id: Option<u64>,
+
         #[command(subcommand)]
         command: Option<TodoCommands>,
     },
     /// Inbox subcommands
     /// Views a user's inbox contents by default
     Inbox {
+        inbox_id: Option<u64>,
+
         #[command(subcommand)]
         command: Option<InboxCommands>,
     },
@@ -59,17 +65,20 @@ pub enum Commands {
 
 #[derive(Subcommand)]
 pub enum CoursesCommands {
-    Ignore,
+    Ignore { course_ids: Option<Vec<u64>> },
+    Assignments { assignment_id: Option<u64> },
+    Submit { assignment_id: Option<u64> },
+    Upload { path: Option<PathBuf> },
 }
 
 #[derive(Subcommand)]
 pub enum TodoCommands {
-    Ignore,
+    Ignore { todo_ids: Option<Vec<u64>> },
 }
 
 #[derive(Subcommand)]
 pub enum InboxCommands {
-    Ignore,
+    Ignore { inbox_ids: Option<Vec<u64>> },
 }
 
 #[derive(Subcommand)]

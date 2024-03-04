@@ -12,10 +12,8 @@ pub async fn ignore_todo<T: std::borrow::Borrow<canvas_cli_config::Config>>(
     client: Client,
     _: T,
     todo: &Todo,
-) -> Result<bool> {
-    client
-        .delete(todo.ignore_url.as_str())
-        .send()
-        .await
-        .map(|res| res.status().is_success())
+) -> Result<()> {
+    client.delete(todo.ignore_url.as_str()).send().await?;
+
+    Ok(())
 }

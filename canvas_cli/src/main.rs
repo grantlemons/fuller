@@ -29,29 +29,70 @@ async fn main() -> anyhow::Result<()> {
     info!("Created request client!");
 
     match &cli.command {
-        cli::Commands::Courses { command: None } => {
-            handle_list_courses(request_client, &config).await?
+        cli::Commands::Courses {
+            course_id: None,
+            command: None,
+        } => {
+            let choice = select_course(request_client, &config).await?;
+            println!("{:#?}", choice);
         }
 
         cli::Commands::Courses {
-            command: Some(CoursesCommands::Ignore),
-        } => ignore_courses(request_client, cli, &config).await?,
+            course_id: None,
+            command: Some(CoursesCommands::Ignore { course_ids: None }),
+        } => ignore_courses(&cli, request_client, &config).await?,
 
-        cli::Commands::Todo { command: None } => handle_list_todo(request_client, &config).await?,
+        cli::Commands::Courses {
+            course_id: None,
+            command:
+                Some(CoursesCommands::Assignments {
+                    assignment_id: None,
+                }),
+        } => {
+            let choice = select_assignment(request_client, &config).await?;
+            println!("{:#?}", choice);
+        }
+
+        cli::Commands::Courses {
+            course_id: None,
+            command:
+                Some(CoursesCommands::Submit {
+                    assignment_id: None,
+                }),
+        } => handle_submit(&cli, request_client, &config).await?,
+
+        cli::Commands::Courses {
+            course_id: None,
+            command: Some(CoursesCommands::Upload { path: Some(path) }),
+        } => handle_upload_file(&cli, request_client, &config, path).await?,
 
         cli::Commands::Todo {
-            command: Some(TodoCommands::Ignore),
+            todo_id: None,
+            command: None,
+        } => {
+            let choice = select_todo(request_client, &config).await?;
+            println!("{:#?}", choice);
+        }
+
+        cli::Commands::Todo {
+            todo_id: None,
+            command: Some(TodoCommands::Ignore { todo_ids: None }),
         } => handle_ignore_todo(request_client, &config).await?,
 
-        cli::Commands::Inbox { command: None } => todo!("Inbox not implemented yet!"),
+        cli::Commands::Inbox {
+            inbox_id: None,
+            command: None,
+        } => todo!("Inbox not implemented yet!"),
 
         cli::Commands::Inbox {
-            command: Some(InboxCommands::Ignore),
+            inbox_id: None,
+            command: Some(InboxCommands::Ignore { inbox_ids: None }),
         } => todo!("Inbox not implemented yet!"),
 
         cli::Commands::Profile { command: None } => {
             handle_show_profile(request_client, &config).await?
         }
+
         _ => {}
     };
 
@@ -93,7 +134,7 @@ fn create_config(cli: &Cli) -> Result<Config, Error> {
 fn setup_logging() -> anyhow::Result<()> {
     let log_file = File::create("most-recent.log")?;
     let subscriber = FmtSubscriber::builder()
-        .with_max_level(Level::TRACE)
+        .with_max_level(Level::INFO)
         .with_writer(Mutex::new(log_file))
         .pretty()
         .finish();

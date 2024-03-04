@@ -1,4 +1,4 @@
-use super::SubmissionType;
+use super::Discussion;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
@@ -33,14 +33,14 @@ pub struct Assignment {
     pub position: u64,
     // pub post_to_sis: bool,
     pub points_possible: Option<f32>,
-    pub submission_types: Vec<SubmissionType>,
+    pub submission_types: Vec<AllowedSubmissionType>,
     pub has_submitted_submissions: bool,
     pub grading_type: GradingType,
     // pub only_visible_to_overrides: bool,
     pub locked_for_user: bool,
     // pub lock_info: Option<>, // is seperate object
     pub lock_explanation: Option<String>,
-    pub discussion_topic: Option<String>,
+    pub discussion_topic: Option<Discussion>,
     // pub overrides: (),
     pub omit_from_final_grade: Option<bool>,
     // pub grader_count: u64,
@@ -79,4 +79,33 @@ pub enum GradingType {
     GpaScale,
     Points,
     NotGraded,
+}
+
+#[derive(Debug, Deserialize, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum AllowedSubmissionType {
+    DiscussionTopic,
+    OnlineQuiz,
+    OnPaper,
+    None,
+    ExternalTool,
+    OnlineTextEntry,
+    OnlineUrl,
+    OnlineUpload,
+    MediaRecording,
+    StudentAnnotation,
+    NotGraded,
+}
+
+impl std::fmt::Display for AllowedSubmissionType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let str = match self {
+            AllowedSubmissionType::OnlineTextEntry => "Text Entry",
+            AllowedSubmissionType::OnlineUrl => "Online URL",
+            AllowedSubmissionType::OnlineUpload => "Previously Attached File",
+            _ => "Not Supported!",
+        };
+
+        write!(f, "{}", str)
+    }
 }
