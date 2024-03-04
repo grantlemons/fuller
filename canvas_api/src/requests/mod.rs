@@ -68,6 +68,7 @@ pub fn create_client(auth_token: AccessToken, config: &Config) -> Result<Client>
 }
 
 pub mod assignment;
+pub mod conversations;
 pub mod course;
 pub mod discussion;
 pub mod module;
@@ -75,6 +76,7 @@ pub mod todo;
 pub mod user;
 
 pub use assignment::*;
+pub use conversations::*;
 pub use course::*;
 pub use discussion::*;
 pub use module::*;
