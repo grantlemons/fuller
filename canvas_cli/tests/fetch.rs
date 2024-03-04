@@ -212,3 +212,39 @@ pub async fn test_discussion_replies_list() -> anyhow::Result<()> {
 
     Ok(())
 }
+
+#[tokio::test]
+async fn test_conversations() -> anyhow::Result<()> {
+    let config = canvas_cli_config::get_config(Some(PathBuf::from(CONFIG_FILE)))?;
+    let auth_token = canvas_auth::connect(&config)
+        .await
+        .context("Fetching Auth Token Failed!")?;
+    let client =
+        canvas_api::create_client(auth_token, &config).context("Creating Client Failed!")?;
+
+    let conversation_overviews =
+        canvas_api::requests::list_conversations(client.to_owned(), &config).await?;
+    let handles = conversation_overviews
+        .iter()
+        .map(|conversation| conversation.id)
+        .map(|conversation_id| {
+            tokio::spawn(canvas_api::requests::get_conversation(
+                client.to_owned(),
+                config.to_owned(),
+                conversation_id,
+            ))
+        });
+    let mut conversations = Vec::new();
+    for handle in handles {
+        let conversation_options = handle.await?;
+        assert!(conversation_options.is_ok());
+
+        conversations.push(conversation_options?);
+    }
+    assert!(conversations
+        .iter()
+        .map(|conversation| conversation.id)
+        .all_unique());
+
+    Ok(())
+}
