@@ -1,17 +1,25 @@
-use anyhow::Context;
+use anyhow::{Context, Result};
 use itertools::Itertools;
 use std::path::PathBuf;
 
-const CONFIG_FILE: &str = "../config.toml";
+use canvas_cli_config::Config;
+use reqwest::Client;
 
-#[tokio::test]
-async fn test_self_info() -> anyhow::Result<()> {
+const CONFIG_FILE: &str = "../config.toml";
+async fn setup() -> Result<(Config, Client)> {
     let config = canvas_cli_config::get_config(Some(PathBuf::from(CONFIG_FILE)))?;
     let auth_token = canvas_auth::connect(&config)
         .await
         .context("Fetching Auth Token Failed!")?;
     let client =
         canvas_api::create_client(auth_token, &config).context("Creating Client Failed!")?;
+
+    Ok((config, client))
+}
+
+#[tokio::test]
+async fn test_self_info() -> Result<()> {
+    let (config, client) = setup().await?;
 
     let profile = canvas_api::requests::get_self(client, &config).await;
     assert!(profile.is_ok());
@@ -20,13 +28,8 @@ async fn test_self_info() -> anyhow::Result<()> {
 }
 
 #[tokio::test]
-async fn test_todo() -> anyhow::Result<()> {
-    let config = canvas_cli_config::get_config(Some(PathBuf::from(CONFIG_FILE)))?;
-    let auth_token = canvas_auth::connect(&config)
-        .await
-        .context("Fetching Auth Token Failed!")?;
-    let client =
-        canvas_api::create_client(auth_token, &config).context("Creating Client Failed!")?;
+async fn test_todo() -> Result<()> {
+    let (config, client) = setup().await?;
 
     let todo = canvas_api::requests::get_todo(client, &config).await;
     assert!(todo.is_ok());
@@ -39,13 +42,8 @@ async fn test_todo() -> anyhow::Result<()> {
 }
 
 #[tokio::test]
-async fn test_course_list() -> anyhow::Result<()> {
-    let config = canvas_cli_config::get_config(Some(PathBuf::from(CONFIG_FILE)))?;
-    let auth_token = canvas_auth::connect(&config)
-        .await
-        .context("Fetching Auth Token Failed!")?;
-    let client =
-        canvas_api::create_client(auth_token, &config).context("Creating Client Failed!")?;
+async fn test_course_list() -> Result<()> {
+    let (config, client) = setup().await?;
 
     let courses = canvas_api::requests::get_courses(client, &config).await;
     assert!(courses.is_ok());
@@ -55,13 +53,8 @@ async fn test_course_list() -> anyhow::Result<()> {
 }
 
 #[tokio::test]
-async fn test_course_assignments() -> anyhow::Result<()> {
-    let config = canvas_cli_config::get_config(Some(PathBuf::from(CONFIG_FILE)))?;
-    let auth_token = canvas_auth::connect(&config)
-        .await
-        .context("Fetching Auth Token Failed!")?;
-    let client =
-        canvas_api::create_client(auth_token, &config).context("Creating Client Failed!")?;
+async fn test_course_assignments() -> Result<()> {
+    let (config, client) = setup().await?;
 
     let courses = canvas_api::requests::get_courses(client.to_owned(), &config).await?;
     let handles = courses.iter().map(|course| course.id).map(|course_id| {
@@ -84,13 +77,8 @@ async fn test_course_assignments() -> anyhow::Result<()> {
 }
 
 #[tokio::test]
-pub async fn test_modules_list() -> anyhow::Result<()> {
-    let config = canvas_cli_config::get_config(Some(PathBuf::from(CONFIG_FILE)))?;
-    let auth_token = canvas_auth::connect(&config)
-        .await
-        .context("Fetching Auth Token Failed!")?;
-    let client =
-        canvas_api::create_client(auth_token, &config).context("Creating Client Failed!")?;
+pub async fn test_modules_list() -> Result<()> {
+    let (config, client) = setup().await?;
 
     let courses = canvas_api::requests::get_courses(client.to_owned(), &config).await?;
     let handles = courses.iter().map(|course| course.id).map(|course_id| {
@@ -110,13 +98,8 @@ pub async fn test_modules_list() -> anyhow::Result<()> {
 }
 
 #[tokio::test]
-pub async fn test_modules_items_list() -> anyhow::Result<()> {
-    let config = canvas_cli_config::get_config(Some(PathBuf::from(CONFIG_FILE)))?;
-    let auth_token = canvas_auth::connect(&config)
-        .await
-        .context("Fetching Auth Token Failed!")?;
-    let client =
-        canvas_api::create_client(auth_token, &config).context("Creating Client Failed!")?;
+pub async fn test_modules_items_list() -> Result<()> {
+    let (config, client) = setup().await?;
 
     let courses = canvas_api::requests::get_courses(client.to_owned(), &config).await?;
     let handles = courses.iter().map(|course| course.id).map(|course_id| {
@@ -141,13 +124,8 @@ pub async fn test_modules_items_list() -> anyhow::Result<()> {
 }
 
 #[tokio::test]
-pub async fn test_discussions_list() -> anyhow::Result<()> {
-    let config = canvas_cli_config::get_config(Some(PathBuf::from(CONFIG_FILE)))?;
-    let auth_token = canvas_auth::connect(&config)
-        .await
-        .context("Fetching Auth Token Failed!")?;
-    let client =
-        canvas_api::create_client(auth_token, &config).context("Creating Client Failed!")?;
+pub async fn test_discussions_list() -> Result<()> {
+    let (config, client) = setup().await?;
 
     let courses = canvas_api::requests::get_courses(client.to_owned(), &config).await?;
     let handles = courses.iter().map(|course| course.id).map(|course_id| {
@@ -170,13 +148,8 @@ pub async fn test_discussions_list() -> anyhow::Result<()> {
 }
 
 #[tokio::test]
-pub async fn test_discussion_replies_list() -> anyhow::Result<()> {
-    let config = canvas_cli_config::get_config(Some(PathBuf::from(CONFIG_FILE)))?;
-    let auth_token = canvas_auth::connect(&config)
-        .await
-        .context("Fetching Auth Token Failed!")?;
-    let client =
-        canvas_api::create_client(auth_token, &config).context("Creating Client Failed!")?;
+pub async fn test_discussion_replies_list() -> Result<()> {
+    let (config, client) = setup().await?;
 
     let courses = canvas_api::requests::get_courses(client.to_owned(), &config).await?;
     let client_handles = courses.iter().map(|course| course.id).map(|course_id| {
@@ -209,6 +182,37 @@ pub async fn test_discussion_replies_list() -> anyhow::Result<()> {
             assert!(replies?.iter().map(|reply| reply.id).all_unique());
         }
     }
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn test_conversations() -> Result<()> {
+    let (config, client) = setup().await?;
+
+    let conversation_overviews =
+        canvas_api::requests::list_conversations(client.to_owned(), &config).await?;
+    let handles = conversation_overviews
+        .iter()
+        .map(|conversation| conversation.id)
+        .map(|conversation_id| {
+            tokio::spawn(canvas_api::requests::get_conversation(
+                client.to_owned(),
+                config.to_owned(),
+                conversation_id,
+            ))
+        });
+    let mut conversations = Vec::new();
+    for handle in handles {
+        let conversation_options = handle.await?;
+        assert!(conversation_options.is_ok());
+
+        conversations.push(conversation_options?);
+    }
+    assert!(conversations
+        .iter()
+        .map(|conversation| conversation.id)
+        .all_unique());
 
     Ok(())
 }
