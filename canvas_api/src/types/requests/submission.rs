@@ -4,6 +4,11 @@ use serde::Serialize;
 pub struct SubmissionRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     comment: Option<String>,
+    submission: SubSubmissionRequest,
+}
+
+#[derive(Debug, Serialize)]
+pub struct SubSubmissionRequest {
     submission_type: SubmissionRequestType,
     /// OnlineTextEntry only
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -40,19 +45,21 @@ impl SubmissionRequest {
 
         let mut res = Self {
             comment,
-            submission_type: submission_type.to_owned(),
-            body: None,
-            url: None,
-            file_ids: None,
-            media_comment_id: None,
-            media_comment_type: None,
-            annotatable_attachment_id: None,
+            submission: SubSubmissionRequest {
+                submission_type: submission_type.to_owned(),
+                body: None,
+                url: None,
+                file_ids: None,
+                media_comment_id: None,
+                media_comment_type: None,
+                annotatable_attachment_id: None,
+            },
         };
 
         match submission_type {
-            SubmissionRequestType::OnlineTextEntry(text) => res.body = Some(text),
-            SubmissionRequestType::OnlineUrl(url) => res.url = Some(url),
-            SubmissionRequestType::OnlineUpload(ids) => res.file_ids = Some(ids),
+            SubmissionRequestType::OnlineTextEntry(text) => res.submission.body = Some(text),
+            SubmissionRequestType::OnlineUrl(url) => res.submission.url = Some(url),
+            SubmissionRequestType::OnlineUpload(ids) => res.submission.file_ids = Some(ids),
             _ => {}
         };
 
