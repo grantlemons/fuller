@@ -16,7 +16,7 @@ pub mod types {
         impl<T: ResponseType> ResponseType for Vec<T> {}
 
         mod assignment;
-        mod conversations;
+        mod conversation;
         mod course;
         mod discussion;
         mod module;
@@ -25,7 +25,7 @@ pub mod types {
         mod todo;
 
         pub use assignment::*;
-        pub use conversations::*;
+        pub use conversation::*;
         pub use course::*;
         pub use discussion::*;
         pub use module::*;
