@@ -1,4 +1,4 @@
-use crate::types::Conversation;
+use crate::types::{Conversation, ConversationOverview};
 use canvas_cli_config::Config;
 use reqwest::{Client, Result};
 use std::borrow::Borrow;
