@@ -20,7 +20,7 @@ use handlers::*;
 async fn main() -> anyhow::Result<()> {
     // Parse before logging setup to prevent empty logfile generation for --help call
     let cli = Cli::parse();
-    setup_logging()?;
+    // setup_logging()?;
 
     let config = create_config(&cli)?;
     let auth_token = canvas_auth::connect(&config)
@@ -139,9 +139,14 @@ fn create_config(cli: &Cli) -> Result<Config, Error> {
         config.network.pagination = pagination.to_owned();
     }
 
+    if config.network.url.is_empty() {
+        return Err(Error::InvalidConfig("URL not configured!"));
+    }
+
     Ok(config)
 }
 
+#[allow(unused)]
 fn setup_logging() -> anyhow::Result<()> {
     let log_file = File::create("most-recent.log")?;
     let subscriber = FmtSubscriber::builder()
