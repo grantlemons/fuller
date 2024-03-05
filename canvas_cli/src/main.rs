@@ -89,21 +89,22 @@ async fn run_handlers(
             Some(TodoCommands::Ignore) => handle_ignore_todo(request_client, config).await?,
         },
 
-        Commands::Inbox { inbox_id, command } => match (inbox_id, command) {
-            (None, None) => todo!(),
-            (None, Some(_)) => todo!(),
-            (Some(_), None) => todo!(),
-            (Some(_), Some(_)) => todo!(),
+        Commands::Inbox {
+            inbox_id: _,
+            command,
+        } => match command {
+            None => todo!("Inbox is not yet supported!"),
+            Some(_) => todo!("Inbox is not yet supported!"),
         },
 
         Commands::Profile { command } => match command {
-            Some(_) => todo!(),
             None => println!(
                 "{}",
                 canvas_api::requests::get_self(request_client, config)
                     .await?
                     .view(config)
             ),
+            Some(_) => todo!("Searching other users is not yet supported!"),
         },
     };
 
