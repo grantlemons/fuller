@@ -12,7 +12,7 @@ mod error;
 mod handlers;
 mod selector;
 
-use cli::{Commands, *};
+use cli::*;
 use error::Error;
 use handlers::*;
 
