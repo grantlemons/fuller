@@ -56,6 +56,7 @@ pub struct Config {
 pub struct FormattingConfig {
     pub date: String,
     pub time: String,
+    pub max_width: usize,
 }
 
 #[derive(Deserialize, Clone, Debug)]

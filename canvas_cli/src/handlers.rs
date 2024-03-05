@@ -1,11 +1,9 @@
 use crate::cli::Cli;
+use crate::error::Error;
 use crate::selector::*;
-use crate::Error;
-use anyhow::Result;
 use canvas_api::requests::*;
 use canvas_api::types::*;
 use canvas_api::upload_to_assignment;
-use canvas_api::Viewable;
 use canvas_cli_config::associate_submission_file;
 use canvas_cli_config::dissassociate_submission_files;
 use canvas_cli_config::Config;
@@ -13,75 +11,30 @@ use canvas_cli_config::ConfigIgnore;
 use reqwest::Client;
 use std::path::{Path, PathBuf};
 use tracing::info;
-use tracing::warn;
 
-pub async fn select_course(request_client: Client, config: &Config) -> Result<Option<Course>> {
-    match prompt_selector(
-        get_courses(request_client, config)
+pub async fn ignore_courses(
+    cli: &Cli,
+    request_client: Client,
+    config: &Config,
+    course_ids: Option<Vec<u64>>,
+) -> Result<(), Error> {
+    let course_ids = course_ids.unwrap_or(
+        select_courses(request_client, config, None)
             .await?
             .into_iter()
-            .filter(|c| !config.ignore.courses.contains(&(c.id as i64)))
+            .map(|c| c.id)
             .collect(),
-    )
-    .await
-    {
-        Err(Error::Input(_)) => warn!("Error getting user input! Ignoring."),
-        Ok(choice) => return Ok(Some(choice)),
-        Err(e) => Err(e)?,
-    }
+    );
 
-    Ok(None)
-}
-
-pub async fn ignore_courses(cli: &Cli, request_client: Client, config: &Config) -> Result<()> {
-    match prompt_multiselector(
-        get_courses(request_client, config)
-            .await?
-            .into_iter()
-            .filter(|c| !config.ignore.courses.contains(&(c.id as i64)))
-            .collect(),
-    )
-    .await
-    {
-        Err(Error::Input(_)) => warn!("Error getting user input! Ignoring."),
-        Ok(choices) => {
-            for choice in choices {
-                info!("User ignored course {}", choice);
-                canvas_cli_config::ignore_id(
-                    cli.config.to_owned(),
-                    ConfigIgnore::Course(choice.id as i64),
-                )?;
-            }
-        }
-        Err(e) => Err(e)?,
+    for course_id in course_ids {
+        info!("User ignored course {}", course_id);
+        canvas_cli_config::ignore_id(
+            cli.config.to_owned(),
+            ConfigIgnore::Course(course_id as i64),
+        )?;
     }
 
     Ok(())
-}
-
-pub async fn select_assignment(
-    request_client: Client,
-    config: &Config,
-) -> Result<Option<Assignment>> {
-    let course_id = match select_course(request_client.clone(), config).await? {
-        Some(choice) => choice.id,
-        None => return Ok(None),
-    };
-    match prompt_selector(
-        list_course_assignments(request_client, config, course_id)
-            .await?
-            .into_iter()
-            .filter(|c| !config.ignore.assignments.contains(&(c.id as i64)))
-            .collect(),
-    )
-    .await
-    {
-        Err(Error::Input(_)) => warn!("Error getting user input! Ignoring."),
-        Ok(choice) => return Ok(Some(choice)),
-        Err(e) => Err(e)?,
-    }
-
-    Ok(None)
 }
 
 fn uploadable_filter(
@@ -108,39 +61,42 @@ fn uploadable_filter(
         }
 }
 
-pub async fn handle_submit(cli: &Cli, request_client: Client, config: &Config) -> Result<()> {
-    let course_id = match select_course(request_client.clone(), config).await? {
-        Some(choice) => choice.id,
-        None => return Ok(()),
-    };
-
-    let assignment: Assignment = match prompt_selector(
-        list_course_assignments(request_client.clone(), config, course_id)
+pub async fn handle_submit(
+    cli: &Cli,
+    request_client: Client,
+    config: &Config,
+    course_id: Option<u64>,
+    assignment_id: Option<u64>,
+) -> Result<(), Error> {
+    let course_id = course_id.unwrap_or(
+        select_course(request_client.clone(), config, None)
             .await?
-            .into_iter()
-            .filter(|c| !config.ignore.assignments.contains(&(c.id as i64)))
-            .filter(|c| {
-                uploadable_filter(c, AllowedSubmissionType::OnlineTextEntry, None)
-                    || uploadable_filter(c, AllowedSubmissionType::OnlineUrl, None)
-                    || (uploadable_filter(c, AllowedSubmissionType::OnlineUpload, None)
-                        && config
-                            .associations
-                            .submission_files
-                            .contains_key(&c.id.to_string()))
-            })
-            .collect(),
-    )
-    .await
-    {
-        Err(Error::Input(_)) => {
-            warn!("Error getting user input! Ignoring.");
-            return Ok(());
-        }
-        Ok(c) => c,
-        Err(e) => Err(e)?,
+            .id,
+    );
+
+    let assignment = if let Some(assignment_id) = assignment_id {
+        get_assignment(request_client.clone(), config, course_id, assignment_id).await?
+    } else {
+        prompt_selector(
+            list_course_assignments(request_client.clone(), config, course_id)
+                .await?
+                .into_iter()
+                .filter(|c| !config.ignore.assignments.contains(&(c.id as i64)))
+                .filter(|c| {
+                    uploadable_filter(c, AllowedSubmissionType::OnlineTextEntry, None)
+                        || uploadable_filter(c, AllowedSubmissionType::OnlineUrl, None)
+                        || (uploadable_filter(c, AllowedSubmissionType::OnlineUpload, None)
+                            && config
+                                .associations
+                                .submission_files
+                                .contains_key(&c.id.to_string()))
+                })
+                .collect(),
+        )
+        .await?
     };
 
-    let submission_type = match prompt_selector(
+    let submission_type = prompt_selector(
         assignment
             .submission_types
             .into_iter()
@@ -151,15 +107,7 @@ pub async fn handle_submit(cli: &Cli, request_client: Client, config: &Config) -
             })
             .collect(),
     )
-    .await
-    {
-        Err(Error::Input(_)) => {
-            warn!("Error getting user input! Ignoring.");
-            return Ok(());
-        }
-        Ok(c) => c,
-        Err(e) => Err(e)?,
-    };
+    .await?;
 
     let submission_type = match submission_type {
         AllowedSubmissionType::OnlineTextEntry => {
@@ -211,37 +159,32 @@ pub async fn handle_submit(cli: &Cli, request_client: Client, config: &Config) -
     Ok(())
 }
 
-pub fn text_entry(message: &str) -> Result<String, inquire::InquireError> {
-    inquire::Editor::new(message).prompt()
-}
-
 pub async fn handle_upload_file(
     cli: &Cli,
     request_client: Client,
     config: &Config,
     path: &PathBuf,
-) -> Result<()> {
-    let course_id = match select_course(request_client.clone(), config).await? {
-        Some(choice) => choice.id,
-        None => return Ok(()),
-    };
-
-    let choice: Assignment = match prompt_selector(
-        list_course_assignments(request_client.clone(), config, course_id)
+    course_id: Option<u64>,
+    assignment_id: Option<u64>,
+) -> Result<(), Error> {
+    let course_id = course_id.unwrap_or(
+        select_course(request_client.clone(), config, None)
             .await?
-            .into_iter()
-            .filter(|c| !config.ignore.assignments.contains(&(c.id as i64)))
-            .filter(|c| uploadable_filter(c, AllowedSubmissionType::OnlineUpload, Some(path)))
-            .collect(),
-    )
-    .await
-    {
-        Err(Error::Input(_)) => {
-            warn!("Error getting user input! Ignoring.");
-            return Ok(());
-        }
-        Ok(c) => c,
-        Err(e) => Err(e)?,
+            .id,
+    );
+
+    let assignment = if let Some(assignment_id) = assignment_id {
+        get_assignment(request_client.clone(), config, course_id, assignment_id).await?
+    } else {
+        prompt_selector(
+            list_course_assignments(request_client.clone(), config, course_id)
+                .await?
+                .into_iter()
+                .filter(|c| !config.ignore.assignments.contains(&(c.id as i64)))
+                .filter(|c| uploadable_filter(c, AllowedSubmissionType::OnlineUpload, Some(path)))
+                .collect(),
+        )
+        .await?
     };
 
     let name = inquire::Text::new("Enter name for upload (include extension)").prompt()?;
@@ -250,44 +193,23 @@ pub async fn handle_upload_file(
         config,
         name,
         path,
-        choice.course_id,
-        choice.id,
+        assignment.course_id,
+        assignment.id,
     )
     .await?;
 
     info!("{:#?}", res);
-    associate_submission_file(cli.config.to_owned(), choice.id, res.id)?;
+    associate_submission_file(cli.config.to_owned(), assignment.id, res.id)?;
 
     Ok(())
 }
 
-pub async fn select_todo(request_client: Client, config: &Config) -> Result<Option<Todo>> {
-    match prompt_selector(get_todo(request_client, config).await?).await {
-        Err(Error::Input(_)) => warn!("Error getting user input! Ignoring."),
-        Ok(choice) => return Ok(Some(choice)),
-        Err(e) => Err(e)?,
+pub async fn handle_ignore_todo(request_client: Client, config: &Config) -> Result<(), Error> {
+    let choices = prompt_multiselector(get_todo(request_client.to_owned(), config).await?).await?;
+
+    for choice in choices {
+        ignore_todo(request_client.to_owned(), config, &choice).await?;
     }
-
-    Ok(None)
-}
-
-pub async fn handle_ignore_todo(request_client: Client, config: &Config) -> Result<()> {
-    match prompt_multiselector(get_todo(request_client.to_owned(), config).await?).await {
-        Err(Error::Input(_)) => warn!("Error getting user input! Ignoring."),
-        Ok(choices) => {
-            for choice in choices {
-                ignore_todo(request_client.to_owned(), config, &choice).await?;
-            }
-        }
-        Err(e) => Err(e)?,
-    }
-
-    Ok(())
-}
-
-pub async fn handle_show_profile(request_client: Client, config: &Config) -> Result<()> {
-    let choice = get_self(request_client, config).await?;
-    println!("{}", choice.view(config));
 
     Ok(())
 }

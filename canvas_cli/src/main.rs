@@ -2,6 +2,7 @@ use anyhow::Context;
 use canvas_api::Viewable;
 use canvas_cli_config::Config;
 use clap::Parser;
+use selector::*;
 use std::{fs::File, sync::Mutex};
 use tracing::{info, warn, Level};
 use tracing_subscriber::FmtSubscriber;
@@ -29,78 +30,84 @@ async fn main() -> anyhow::Result<()> {
         canvas_api::create_client(auth_token, &config).context("Creating Client Failed!")?;
     info!("Created request client!");
 
-    match &cli.command {
-        cli::Commands::Courses {
-            course_id: None,
-            command: None,
-        } => {
-            if let Some(choice) = select_course(request_client, &config).await? {
-                println!("{}", choice.view(&config));
-            }
-        }
-
-        cli::Commands::Courses {
-            course_id: None,
-            command: Some(CoursesCommands::Ignore { course_ids: None }),
-        } => ignore_courses(&cli, request_client, &config).await?,
-
-        cli::Commands::Courses {
-            course_id: None,
-            command:
-                Some(CoursesCommands::Assignments {
-                    assignment_id: None,
-                }),
-        } => {
-            if let Some(choice) = select_assignment(request_client, &config).await? {
-                println!("{}", choice.view(&config));
-            }
-        }
-
-        cli::Commands::Courses {
-            course_id: None,
-            command:
-                Some(CoursesCommands::Submit {
-                    assignment_id: None,
-                }),
-        } => handle_submit(&cli, request_client, &config).await?,
-
-        cli::Commands::Courses {
-            course_id: None,
-            command: Some(CoursesCommands::Upload { path: Some(path) }),
-        } => handle_upload_file(&cli, request_client, &config, path).await?,
-
-        cli::Commands::Todo {
-            todo_id: None,
-            command: None,
-        } => {
-            if let Some(choice) = select_todo(request_client, &config).await? {
-                println!("{}", choice.view(&config));
-            }
-        }
-
-        cli::Commands::Todo {
-            todo_id: None,
-            command: Some(TodoCommands::Ignore { todo_ids: None }),
-        } => handle_ignore_todo(request_client, &config).await?,
-
-        cli::Commands::Inbox {
-            inbox_id: None,
-            command: None,
-        } => todo!("Inbox not implemented yet!"),
-
-        cli::Commands::Inbox {
-            inbox_id: None,
-            command: Some(InboxCommands::Ignore { inbox_ids: None }),
-        } => todo!("Inbox not implemented yet!"),
-
-        cli::Commands::Profile { command: None } => {
-            handle_show_profile(request_client, &config).await?
-        }
-
-        _ => {}
-    };
+    match run_handlers(cli, request_client, &config).await {
+        Ok(_) => {}
+        Err(Error::Input(_)) => {}
+        Err(e) => Err(e)?,
+    }
 
     warn!("Program complete, terminating!");
+    Ok(())
+}
+
+async fn run_handlers(
+    cli: Cli,
+    request_client: reqwest::Client,
+    config: &Config,
+) -> Result<(), Error> {
+    match cli.command.to_owned() {
+        Commands::Courses { course_id, command } => match command {
+            None => println!(
+                "{}",
+                select_course(request_client, config, course_id)
+                    .await?
+                    .view(config)
+            ),
+            Some(CoursesCommands::Assignments { assignment_id }) => println!(
+                "{}",
+                select_assignment(request_client, config, course_id, assignment_id)
+                    .await?
+                    .view(config)
+            ),
+            Some(CoursesCommands::Ignore { course_ids }) => {
+                ignore_courses(&cli, request_client, config, course_ids).await?
+            }
+            Some(CoursesCommands::Upload {
+                assignment_id,
+                path,
+            }) => {
+                handle_upload_file(
+                    &cli,
+                    request_client,
+                    config,
+                    &path,
+                    course_id,
+                    assignment_id,
+                )
+                .await?
+            }
+            Some(CoursesCommands::Submit { assignment_id }) => {
+                handle_submit(&cli, request_client, config, course_id, assignment_id).await?
+            }
+        },
+
+        Commands::Todo { command } => match command {
+            None => println!(
+                "{}",
+                select_todo(request_client, config).await?.view(config)
+            ),
+            Some(TodoCommands::Ignore) => handle_ignore_todo(request_client, config).await?,
+        },
+
+        Commands::Inbox {
+            inbox_id: _,
+            command,
+        } => match command {
+            None => todo!("Inbox is not yet supported!"),
+            Some(_) => todo!("Inbox is not yet supported!"),
+        },
+
+        Commands::Profile { command } => match command {
+            None => println!(
+                "{}",
+                canvas_api::requests::get_self(request_client, config)
+                    .await?
+                    .view(config)
+            ),
+            Some(_) => todo!("Searching other users is not yet supported!"),
+        },
+    };
+
     Ok(())
 }
 

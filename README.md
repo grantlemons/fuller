@@ -16,21 +16,22 @@ Courses Commands
 - [ ] List Todo
 - [ ] List Discussions
 - [ ] List Grades (Only graded submissions?)
-- [ ] List Assignments
+- [x] List Assignments
 - [ ] List Modules
 
 View Interfaces
 
 - [x] View a Course
-- [ ] View a Todo Item (Assignment)
-- [ ] View a Profile
+- [x] View a Todo Item (Assignment)
+- [x] View a Profile
 - [ ] View a Discussion
 - [ ] View a Submission
-- [ ] View an Assignment
+- [x] View an Assignment
 
 Other
 
-- [ ] Ignore a Todo Item
+- [x] Ignore a Todo Item
+- [x] Ignore a Course
 
 Issues
 
