@@ -11,9 +11,9 @@ categories = ["command-line-utilities"]
 edition = "2021"
 
 [dependencies]
-fuller_canvas_api = { path = "../fuller_canvas_api" }
-fuller_canvas_auth = { path = "../fuller_canvas_auth" }
-fuller_config = { path = "../fuller_config" }
+fuller_canvas_api = { version = "0.1.0", path = "../fuller_canvas_api" }
+fuller_canvas_auth = { version = "0.1.0", path = "../fuller_canvas_auth" }
+fuller_config = { version = "0.1.0", path = "../fuller_config" }
 clap = { version = "4.5.0", features = ["derive"] }
 inquire = { version = "0.6.2", features = ["editor"] }
 serde = { version = "1.0.196", features = ["serde_derive"] }

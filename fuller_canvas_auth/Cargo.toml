@@ -9,7 +9,7 @@ keywords = ["canvas_api", "fuller"]
 edition = "2021"
 
 [dependencies]
-fuller_config = { path = "../fuller_config" }
+fuller_config = { version = "0.1.0", path = "../fuller_config" }
 keyring = "2.3.2"
 oauth2 = "4.4.2"
 serde = "1.0.197"
