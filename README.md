@@ -9,7 +9,7 @@ Root Level
 - [x] List Courses
 - [x] List Todo
 - [ ] List Inbox
-- [ ] Show Profile
+- [x] Show Profile
 
 Courses Commands
 
