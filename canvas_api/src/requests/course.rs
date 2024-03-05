@@ -22,7 +22,7 @@ pub async fn get_course(
         client,
         config.borrow(),
         &format!("/api/v1/courses/{course_id}"),
-        Some(&[("enrollment_state", "active")]),
+        None,
     )
     .await
 }
