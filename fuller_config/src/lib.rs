@@ -35,7 +35,7 @@ impl From<String> for AccessToken {
 }
 
 impl AccessToken {
-    pub fn new<T: ToString>(value: T) -> Self {
+    pub fn new(value: impl ToString) -> Self {
         Self(value.to_string())
     }
 

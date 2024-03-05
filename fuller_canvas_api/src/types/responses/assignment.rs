@@ -191,7 +191,7 @@ impl std::fmt::Display for AllowedSubmissionType {
     }
 }
 
-fn display_vec<T: std::fmt::Display>(vec: Vec<T>, max_width: usize) -> String {
+fn display_vec(vec: Vec<impl std::fmt::Display>, max_width: usize) -> String {
     let mut res_str: String;
     if let Some(initial_value) = vec.first() {
         res_str = initial_value.to_string();

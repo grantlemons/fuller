@@ -4,6 +4,9 @@ use serde::{Deserialize, Serialize};
 use std::io::Read;
 use tracing::info;
 
+use fuller_config::Config;
+use std::borrow::Borrow;
+
 #[derive(Debug, Serialize)]
 pub struct FileNotifyRequest {
     pub name: String,
@@ -27,9 +30,9 @@ pub struct FileNotifyResponse {
     pub upload_params: serde_json::Map<String, serde_json::Value>,
 }
 
-async fn notify_submission<T: std::borrow::Borrow<fuller_config::Config>>(
+async fn notify_submission(
     client: Client,
-    config: T,
+    config: impl Borrow<Config>,
     request: FileNotifyRequest,
     course_id: u64,
     assignment_id: u64,
@@ -77,9 +80,9 @@ async fn upload_as_instructed(
         .await
 }
 
-pub async fn upload_to_assignment<T: std::borrow::Borrow<fuller_config::Config>>(
+pub async fn upload_to_assignment(
     client: Client,
-    config: T,
+    config: impl Borrow<Config>,
     name: String,
     path: &std::path::PathBuf,
     course_id: u64,

@@ -26,7 +26,7 @@ impl From<AccessToken> for fuller_config::AccessToken {
 }
 
 impl AccessToken {
-    pub fn new<T: ToString>(value: T) -> Self {
+    pub fn new(value: impl ToString) -> Self {
         Self(value.to_string())
     }
 
