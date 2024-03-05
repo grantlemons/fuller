@@ -12,6 +12,6 @@ edition = "2021"
 fuller_config = { version = "0.1.0", path = "../fuller_config" }
 keyring = "2.3.2"
 oauth2 = "4.4.2"
-serde = "1.0.197"
+serde = { version = "1.0.196", features = ["serde_derive"] }
 thiserror = "1.0.57"
 tracing = "0.1.40"
