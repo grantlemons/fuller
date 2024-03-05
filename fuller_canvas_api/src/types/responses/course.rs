@@ -30,20 +30,20 @@ impl super::Viewable for Course {
     fn view(&self, config: &fuller_config::Config) -> String {
         let start_at_string = match self.start_at {
             Some(date) => format!(
-                "Started On: {}",
+                "\nStarted On: {}",
                 DateTime::<Local>::from(date).format(&config.formatting.date)
             ),
             None => String::default(),
         };
         let end_at_string = match self.end_at {
             Some(date) => format!(
-                "Ends On:    {}",
+                "\nEnds On:    {}",
                 DateTime::<Local>::from(date).format(&config.formatting.date)
             ),
             None => String::default(),
         };
         format!(
-            "[{}] {}\n{}\n{}", // TODO: Investigate formatting w/ termcolor
+            "[{}] {}{}{}", // TODO: Investigate formatting w/ termcolor
             self.id, self.name, start_at_string, end_at_string
         )
     }
