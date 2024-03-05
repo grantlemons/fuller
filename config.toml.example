@@ -10,6 +10,7 @@
 # For date and time formatting, see https://docs.rs/chrono/latest/chrono/format/strftime/index.html
 date = "%F" # YYYY-MM-DD
 time = "%R" # 24h Time
+max_width = 160 # Character width rendered for HTML
 
 [network]
 url = ""

@@ -85,9 +85,12 @@ impl super::Viewable for Assignment {
                     .submission_types
                     .contains(&AllowedSubmissionType::OnlineUpload) =>
             {
-                format!("\n\nAllowed Extensions =============================================================
+                format!(
+                    "\n\nAllowed Extensions =====================
 {}
-================================================================================", display_vec(vec))
+========================================",
+                    display_vec(vec, config.formatting.max_width)
+                )
             }
             _ => String::default(),
         };
@@ -100,7 +103,7 @@ impl super::Viewable for Assignment {
             (Some(explanation), true, Some(unlock_at)) => {
                 format!(
                     "\n\nAssignment is Locked!\n{}\nWill unlock at {}",
-                    html2text::from_read(&mut explanation.as_bytes(), 80),
+                    html2text::from_read(&mut explanation.as_bytes(), config.formatting.max_width),
                     DateTime::<Local>::from(unlock_at).format(&crate::datetime_format(config))
                 )
             }
@@ -115,7 +118,7 @@ impl super::Viewable for Assignment {
             Some(description) => {
                 format!(
                     "\n\n{}",
-                    html2text::from_read(&mut description.as_bytes(), 80)
+                    html2text::from_read(&mut description.as_bytes(), config.formatting.max_width)
                 )
             }
             None => String::default(),
@@ -123,16 +126,19 @@ impl super::Viewable for Assignment {
         format!(
             "[{}] {}
 HTML Link: {}{}{}{}
-Allowed Submission Types =======================================================
+Allowed Submission Types ===============
 {}
-================================================================================{}", // TODO: Investigate formatting w/ termcolor
+========================================{}", // TODO: Investigate formatting w/ termcolor
             self.id,
             self.name,
             self.html_url,
             due_at,
             lock_explanation,
             description,
-            display_vec(self.submission_types.to_owned()),
+            display_vec(
+                self.submission_types.to_owned(),
+                config.formatting.max_width
+            ),
             allowed_extensions,
         )
     }
@@ -185,9 +191,7 @@ impl std::fmt::Display for AllowedSubmissionType {
     }
 }
 
-fn display_vec<T: std::fmt::Display>(vec: Vec<T>) -> String {
-    const MAX_LINE_LENGTH: usize = 80;
-
+fn display_vec<T: std::fmt::Display>(vec: Vec<T>, max_width: usize) -> String {
     let mut res_str: String;
     if let Some(initial_value) = vec.first() {
         res_str = initial_value.to_string();
@@ -199,7 +203,7 @@ fn display_vec<T: std::fmt::Display>(vec: Vec<T>) -> String {
     for v in vec[1..].iter() {
         // newline if 80 chars
         let new_string = v.to_string();
-        if res_str.len() + new_string.len() + 2 - line_index >= MAX_LINE_LENGTH {
+        if res_str.len() + new_string.len() + 2 - line_index >= max_width {
             res_str.push_str(",\n");
             line_index = res_str.len();
 
