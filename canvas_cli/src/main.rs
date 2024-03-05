@@ -1,5 +1,5 @@
 use anyhow::Context;
-use canvas_api::types::Viewable;
+use canvas_api::Viewable;
 use canvas_cli_config::Config;
 use clap::Parser;
 use std::{fs::File, sync::Mutex};
@@ -73,8 +73,9 @@ async fn main() -> anyhow::Result<()> {
             todo_id: None,
             command: None,
         } => {
-            let choice = select_todo(request_client, &config).await?;
-            println!("{:#?}", choice);
+            if let Some(choice) = select_todo(request_client, &config).await? {
+                println!("{}", choice.view(&config));
+            }
         }
 
         cli::Commands::Todo {

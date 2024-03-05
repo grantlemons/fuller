@@ -52,3 +52,4 @@ pub mod requests;
 
 pub use file_upload::*;
 pub use requests::create_client;
+pub use types::Viewable;
