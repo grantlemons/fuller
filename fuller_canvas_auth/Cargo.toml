@@ -1,9 +1,12 @@
 [package]
 name = "fuller_canvas_auth"
+authors = ["Grant Lemons <grantlemons@aol.com>"]
 version = "0.1.0"
+description = "Auth library to interact with Canvas LMS used by the Fuller project"
+repository = "https://github.com/grantlemons/canvas-cli/"
+license = "GPL-3.0-only"
+keywords = ["canvas_api", "fuller"]
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 fuller_config = { path = "../fuller_config" }

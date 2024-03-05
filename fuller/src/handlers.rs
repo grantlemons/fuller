@@ -4,11 +4,11 @@ use crate::selector::*;
 use fuller_canvas_api::requests::*;
 use fuller_canvas_api::types::*;
 use fuller_canvas_api::upload_to_assignment;
+use fuller_canvas_api::Client;
 use fuller_config::associate_submission_file;
 use fuller_config::dissassociate_submission_files;
 use fuller_config::Config;
 use fuller_config::ConfigIgnore;
-use reqwest::Client;
 use std::path::{Path, PathBuf};
 use tracing::info;
 
@@ -143,10 +143,6 @@ pub async fn handle_submit(
     info!("Comment: {:?}", comment);
     let submission_request = SubmissionRequest::new(submission_type, comment);
 
-    info!(
-        "Submitting assignment! Request is: {:#?}",
-        serde_json::to_string(&submission_request)
-    );
     submit_assignment(
         request_client,
         config,

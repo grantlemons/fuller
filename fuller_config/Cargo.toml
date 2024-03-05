@@ -1,9 +1,12 @@
 [package]
 name = "fuller_config"
+authors = ["Grant Lemons <grantlemons@aol.com>"]
 version = "0.1.0"
+description = "Utility used to interact with config files used by the Fuller project"
+repository = "https://github.com/grantlemons/canvas-cli/"
+license = "GPL-3.0-only"
+keywords = ["canvas_api", "fuller"]
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 dirs = "5.0.1"

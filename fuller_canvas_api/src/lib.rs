@@ -47,9 +47,12 @@ fn datetime_format(config: &fuller_config::Config) -> String {
     format!("{} {}", config.formatting.date, config.formatting.time)
 }
 
+pub mod error;
 pub mod file_upload;
 pub mod requests;
 
+pub use error::ApiError;
 pub use file_upload::*;
 pub use requests::create_client;
+pub use reqwest::Client;
 pub use types::Viewable;

@@ -1,6 +1,7 @@
 use crate::types::{Assignment, Submission, SubmissionRequest};
+use crate::ApiError;
 use fuller_config::Config;
-use reqwest::{Client, Result};
+use reqwest::Client;
 use std::borrow::Borrow;
 
 pub async fn get_submissions(
@@ -8,7 +9,7 @@ pub async fn get_submissions(
     config: impl Borrow<Config>,
     course_id: u64,
     assignment_id: u64,
-) -> Result<Submission> {
+) -> Result<Submission, ApiError> {
     super::get_generic(
         client,
         config.borrow(),
@@ -24,7 +25,7 @@ pub async fn submit_assignment(
     course_id: u64,
     assignment_id: u64,
     submission_request: SubmissionRequest,
-) -> Result<()> {
+) -> Result<(), ApiError> {
     client
         .post(&format!(
             "{}/api/v1/courses/{course_id}/assignments/{assignment_id}/submissions",
@@ -42,7 +43,7 @@ pub async fn get_assignment(
     config: impl Borrow<Config>,
     course_id: u64,
     assignment_id: u64,
-) -> Result<Assignment> {
+) -> Result<Assignment, ApiError> {
     super::get_generic(
         client,
         config.borrow(),
@@ -56,7 +57,7 @@ pub async fn list_course_assignments(
     client: Client,
     config: impl Borrow<Config>,
     course_id: u64,
-) -> Result<Vec<Assignment>> {
+) -> Result<Vec<Assignment>, ApiError> {
     super::get_generic(
         client,
         config.borrow(),

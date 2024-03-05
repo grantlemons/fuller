@@ -1,13 +1,14 @@
 use crate::types::Profile;
+use crate::ApiError;
 use fuller_config::Config;
-use reqwest::{Client, Result};
+use reqwest::Client;
 use std::borrow::Borrow;
 
 pub async fn get_profile(
     client: Client,
     config: impl Borrow<Config>,
     user_id: u64,
-) -> Result<Profile> {
+) -> Result<Profile, ApiError> {
     super::get_generic(
         client,
         config.borrow(),
@@ -17,6 +18,6 @@ pub async fn get_profile(
     .await
 }
 
-pub async fn get_self(client: Client, config: impl Borrow<Config>) -> Result<Profile> {
+pub async fn get_self(client: Client, config: impl Borrow<Config>) -> Result<Profile, ApiError> {
     super::get_generic(client, config.borrow(), "/api/v1/users/self/profile", None).await
 }

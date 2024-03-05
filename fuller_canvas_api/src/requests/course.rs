@@ -1,9 +1,13 @@
 use crate::types::Course;
+use crate::ApiError;
 use fuller_config::Config;
-use reqwest::{Client, Result};
+use reqwest::Client;
 use std::borrow::Borrow;
 
-pub async fn get_courses(client: Client, config: impl Borrow<Config>) -> Result<Vec<Course>> {
+pub async fn get_courses(
+    client: Client,
+    config: impl Borrow<Config>,
+) -> Result<Vec<Course>, ApiError> {
     super::get_generic(
         client,
         config.borrow(),
@@ -17,7 +21,7 @@ pub async fn get_course(
     client: Client,
     config: impl Borrow<Config>,
     course_id: u64,
-) -> Result<Course> {
+) -> Result<Course, ApiError> {
     super::get_generic(
         client,
         config.borrow(),

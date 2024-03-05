@@ -1,8 +1,9 @@
+use crate::ApiError;
 use fuller_canvas_auth::AccessToken;
 use fuller_config::Config;
 use reqwest::{
     header::{HeaderMap, HeaderValue},
-    Client, ClientBuilder, Result,
+    Client, ClientBuilder,
 };
 use tracing::{info, instrument};
 
@@ -12,7 +13,7 @@ async fn get_generic<T: crate::types::ResponseType>(
     config: &Config,
     path: &str,
     query: Option<&[(&str, &str)]>,
-) -> reqwest::Result<T> {
+) -> Result<T, ApiError> {
     let address = config.network.url.to_owned() + path;
     info!("Request address is {address}");
 
@@ -32,7 +33,7 @@ async fn get_generic<T: crate::types::ResponseType>(
 #[instrument]
 async fn parse_result<T: crate::types::ResponseType>(
     response: reqwest::Response,
-) -> reqwest::Result<T> {
+) -> Result<T, ApiError> {
     info!("Getting body from response...");
     let body = response.text().await?;
     let untyped: serde_json::Value = serde_json::from_str(&body).unwrap();
@@ -50,7 +51,7 @@ async fn parse_result<T: crate::types::ResponseType>(
 }
 
 #[instrument]
-pub fn create_client(auth_token: AccessToken, config: &Config) -> Result<Client> {
+pub fn create_client(auth_token: AccessToken, config: &Config) -> Result<Client, ApiError> {
     info!("Building application reqwest client...");
     info!("Default pagination set to {}", config.network.pagination);
     info!("Setting auth header...");
@@ -64,7 +65,7 @@ pub fn create_client(auth_token: AccessToken, config: &Config) -> Result<Client>
     headers.insert(reqwest::header::AUTHORIZATION, auth_bearer);
     headers.insert("per_page", config.network.pagination.into());
 
-    ClientBuilder::new().default_headers(headers).build()
+    Ok(ClientBuilder::new().default_headers(headers).build()?)
 }
 
 pub mod assignment;

@@ -1,11 +1,11 @@
+use crate::ApiError;
 use chrono::{DateTime, Utc};
-use reqwest::{Client, Result};
+use fuller_config::Config;
+use reqwest::Client;
 use serde::{Deserialize, Serialize};
+use std::borrow::Borrow;
 use std::io::Read;
 use tracing::info;
-
-use fuller_config::Config;
-use std::borrow::Borrow;
 
 #[derive(Debug, Serialize)]
 pub struct FileNotifyRequest {
@@ -36,7 +36,7 @@ async fn notify_submission(
     request: FileNotifyRequest,
     course_id: u64,
     assignment_id: u64,
-) -> Result<FileNotifyResponse> {
+) -> Result<FileNotifyResponse, ApiError> {
     let url = format!(
         "{}/api/v1/courses/{course_id}/assignments/{assignment_id}/submissions/self/files",
         config.borrow().network.url
@@ -44,14 +44,16 @@ async fn notify_submission(
 
     info!("Requesting instructions!");
     info!("Url: {url}");
-    client.post(url).form(&request).send().await?.json().await
+    let res = client.post(url).form(&request).send().await?.json().await?;
+
+    Ok(res)
 }
 
 async fn upload_as_instructed(
     client: Client,
     server_instructions: FileNotifyResponse,
     file: &mut std::fs::File,
-) -> Result<FileUploadResponse> {
+) -> Result<FileUploadResponse, ApiError> {
     let mut multipart: reqwest::multipart::Form = reqwest::multipart::Form::new();
     for param in server_instructions.upload_params {
         info!("Server upload param: ({}, {})", param.0, param.1);
@@ -70,14 +72,17 @@ async fn upload_as_instructed(
     multipart = multipart.part("file", file);
 
     info!("Uploading file as instructed!");
-    client
+
+    let res = client
         .post(server_instructions.upload_url)
         .multipart(multipart)
         .header(reqwest::header::AUTHORIZATION, "")
         .send()
         .await?
         .json()
-        .await
+        .await?;
+
+    Ok(res)
 }
 
 pub async fn upload_to_assignment(
@@ -87,7 +92,7 @@ pub async fn upload_to_assignment(
     path: &std::path::PathBuf,
     course_id: u64,
     assignment_id: u64,
-) -> Result<FileUploadResponse> {
+) -> Result<FileUploadResponse, ApiError> {
     info!("Opening provided file for upload!");
     let mut file: std::fs::File = std::fs::File::open(path).unwrap();
     let metadata = file.metadata().expect("Unable to get file metadata!");

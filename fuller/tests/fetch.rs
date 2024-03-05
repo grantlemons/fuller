@@ -1,24 +1,21 @@
-use anyhow::{Context, Result};
 use itertools::Itertools;
 use std::path::PathBuf;
 
+use crate::Error;
+use fuller_canvas_api::Client;
 use fuller_config::Config;
-use reqwest::Client;
 
 const CONFIG_FILE: &str = "../config.toml";
-async fn setup() -> Result<(Config, Client)> {
+async fn setup() -> Result<(Config, Client), Error> {
     let config = fuller_config::get_config(Some(PathBuf::from(CONFIG_FILE)))?;
-    let auth_token = fuller_canvas_auth::connect(&config)
-        .await
-        .context("Fetching Auth Token Failed!")?;
-    let client =
-        fuller_canvas_api::create_client(auth_token, &config).context("Creating Client Failed!")?;
+    let auth_token = fuller_canvas_auth::connect(&config).await?;
+    let client = fuller_canvas_api::create_client(auth_token, &config)?;
 
     Ok((config, client))
 }
 
 #[tokio::test]
-async fn test_self_info() -> Result<()> {
+async fn test_self_info() -> Result<(), Error> {
     let (config, client) = setup().await?;
 
     let profile = fuller_canvas_api::requests::get_self(client, &config).await;
@@ -28,7 +25,7 @@ async fn test_self_info() -> Result<()> {
 }
 
 #[tokio::test]
-async fn test_todo() -> Result<()> {
+async fn test_todo() -> Result<(), Error> {
     let (config, client) = setup().await?;
 
     let todo = fuller_canvas_api::requests::get_todo(client, &config).await;
@@ -42,7 +39,7 @@ async fn test_todo() -> Result<()> {
 }
 
 #[tokio::test]
-async fn test_course_list() -> Result<()> {
+async fn test_course_list() -> Result<(), Error> {
     let (config, client) = setup().await?;
 
     let courses = fuller_canvas_api::requests::get_courses(client, &config).await;
@@ -53,7 +50,7 @@ async fn test_course_list() -> Result<()> {
 }
 
 #[tokio::test]
-async fn test_course_assignments() -> Result<()> {
+async fn test_course_assignments() -> Result<(), Error> {
     let (config, client) = setup().await?;
 
     let courses = fuller_canvas_api::requests::get_courses(client.to_owned(), &config).await?;
@@ -77,7 +74,7 @@ async fn test_course_assignments() -> Result<()> {
 }
 
 #[tokio::test]
-pub async fn test_modules_list() -> Result<()> {
+pub async fn test_modules_list() -> Result<(), Error> {
     let (config, client) = setup().await?;
 
     let courses = fuller_canvas_api::requests::get_courses(client.to_owned(), &config).await?;
@@ -98,7 +95,7 @@ pub async fn test_modules_list() -> Result<()> {
 }
 
 #[tokio::test]
-pub async fn test_modules_items_list() -> Result<()> {
+pub async fn test_modules_items_list() -> Result<(), Error> {
     let (config, client) = setup().await?;
 
     let courses = fuller_canvas_api::requests::get_courses(client.to_owned(), &config).await?;
@@ -124,7 +121,7 @@ pub async fn test_modules_items_list() -> Result<()> {
 }
 
 #[tokio::test]
-pub async fn test_discussions_list() -> Result<()> {
+pub async fn test_discussions_list() -> Result<(), Error> {
     let (config, client) = setup().await?;
 
     let courses = fuller_canvas_api::requests::get_courses(client.to_owned(), &config).await?;
@@ -148,7 +145,7 @@ pub async fn test_discussions_list() -> Result<()> {
 }
 
 #[tokio::test]
-pub async fn test_discussion_replies_list() -> Result<()> {
+pub async fn test_discussion_replies_list() -> Result<(), Error> {
     let (config, client) = setup().await?;
 
     let courses = fuller_canvas_api::requests::get_courses(client.to_owned(), &config).await?;
@@ -187,7 +184,7 @@ pub async fn test_discussion_replies_list() -> Result<()> {
 }
 
 #[tokio::test]
-async fn test_conversations() -> Result<()> {
+async fn test_conversations() -> Result<(), Error> {
     let (config, client) = setup().await?;
 
     let conversation_overviews =

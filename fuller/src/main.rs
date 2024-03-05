@@ -1,7 +1,7 @@
-use anyhow::Context;
+use clap::Parser;
+use fuller_canvas_api::Client;
 use fuller_canvas_api::Viewable;
 use fuller_config::Config;
-use clap::Parser;
 use selector::*;
 use std::{fs::File, sync::Mutex};
 use tracing::{info, warn, Level};
@@ -13,21 +13,18 @@ mod handlers;
 mod selector;
 
 use cli::*;
-use error::Error;
+pub use error::Error;
 use handlers::*;
 
 #[tokio::main]
-async fn main() -> anyhow::Result<()> {
+async fn main() -> Result<(), Error> {
     // Parse before logging setup to prevent empty logfile generation for --help call
     let cli = Cli::parse();
-    // setup_logging()?;
+    // setup_logging();
 
     let config = create_config(&cli)?;
-    let auth_token = fuller_canvas_auth::connect(&config)
-        .await
-        .context("Fetching Auth Token Failed!")?;
-    let request_client =
-        fuller_canvas_api::create_client(auth_token, &config).context("Creating Client Failed!")?;
+    let auth_token = fuller_canvas_auth::connect(&config).await?;
+    let request_client = fuller_canvas_api::create_client(auth_token, &config)?;
     info!("Created request client!");
 
     match run_handlers(cli, request_client, &config).await {
@@ -40,11 +37,7 @@ async fn main() -> anyhow::Result<()> {
     Ok(())
 }
 
-async fn run_handlers(
-    cli: Cli,
-    request_client: reqwest::Client,
-    config: &Config,
-) -> Result<(), Error> {
+async fn run_handlers(cli: Cli, request_client: Client, config: &Config) -> Result<(), Error> {
     match cli.command.to_owned() {
         Commands::Courses { course_id, command } => match command {
             None => println!(
@@ -147,15 +140,12 @@ fn create_config(cli: &Cli) -> Result<Config, Error> {
 }
 
 #[allow(unused)]
-fn setup_logging() -> anyhow::Result<()> {
-    let log_file = File::create("most-recent.log")?;
+fn setup_logging() {
+    let log_file = File::create("most-recent.log").unwrap();
     let subscriber = FmtSubscriber::builder()
         .with_max_level(Level::INFO)
         .with_writer(Mutex::new(log_file))
         .pretty()
         .finish();
-    tracing::subscriber::set_global_default(subscriber)
-        .context("Setting default subscriber failed")?;
-
-    Ok(())
+    tracing::subscriber::set_global_default(subscriber).unwrap();
 }

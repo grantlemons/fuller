@@ -1,7 +1,7 @@
 use crate::error::Error;
+use fuller_canvas_api::Client;
 use fuller_canvas_api::{requests::*, types::*};
 use fuller_config::Config;
-use reqwest::Client;
 use tracing::info;
 
 pub async fn prompt_selector<T: std::fmt::Display + std::fmt::Debug>(
