@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 fn main() {
     let mut path = dirs::config_dir().unwrap_or(PathBuf::from("."));
-    path.push("canvas_cli");
+    path.push("fuller");
     path.push("config.toml");
 
     let prefix = path.parent().unwrap();
