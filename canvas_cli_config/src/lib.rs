@@ -96,7 +96,7 @@ pub fn config_path(path: Option<PathBuf>) -> PathBuf {
         path
     } else {
         let mut path = dirs::config_dir().unwrap_or(PathBuf::from("."));
-        path.push("canvas_cli");
+        path.push("fuller");
         path.push("config.toml");
 
         if !path.exists() {
