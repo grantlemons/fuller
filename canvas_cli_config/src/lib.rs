@@ -92,9 +92,21 @@ pub enum ConfigIgnore {
 }
 
 pub fn config_path(path: Option<PathBuf>) -> PathBuf {
-    match path {
-        Some(p) => p,
-        None => PathBuf::from("./config.toml"),
+    if let Some(path) = path {
+        path
+    } else {
+        let mut path = dirs::config_dir().unwrap_or(PathBuf::from("."));
+        path.push("canvas_cli");
+        path.push("config.toml");
+
+        if !path.exists() {
+            panic!(
+                "Create config file at {:?} or specify one with a flag.",
+                path
+            )
+        }
+
+        path
     }
 }
 

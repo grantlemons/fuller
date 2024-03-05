@@ -6,8 +6,10 @@ pub(crate) enum Error {
     Request(#[from] reqwest::Error),
     #[error("User input error")]
     Input(#[from] inquire::error::InquireError),
-    #[error(" with Config")]
+    #[error("Configuration Error")]
     Config(#[from] canvas_cli_config::ConfigError),
+    #[error("Invalid config setting")]
+    InvalidConfig(&'static str),
     #[error("More options required for no config flag")]
     NeedMoreOptions,
 }

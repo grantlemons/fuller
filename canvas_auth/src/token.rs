@@ -6,8 +6,8 @@ use tracing::info;
 #[tracing::instrument]
 pub async fn connect(config: &Config) -> Result<AccessToken, AuthError> {
     let token = match &config.network.token {
-        Some(t) => t.to_owned(),
-        None => return Err(AuthError::NullToken),
+        Some(t) if !t.secret().is_empty() => t.to_owned(),
+        _ => return Err(AuthError::NullToken),
     };
     let access_token = AccessToken::from(token);
 
