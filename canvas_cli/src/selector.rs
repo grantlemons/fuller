@@ -19,7 +19,7 @@ pub async fn prompt_multiselector<T: std::fmt::Display + std::fmt::Debug>(
         .with_vim_mode(true)
         .with_page_size(15)
         .prompt()?;
-    info!("User made selections: {:?}", selection);
+    info!("User made selections: {}", selection);
 
     Ok(selection)
 }

@@ -32,7 +32,7 @@ impl std::cmp::PartialEq for Todo {
 impl std::fmt::Display for Todo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if let Some(a) = &self.assignment {
-            write!(f, "{}", a.name)
+            write!(f, "[{}] {}", a.id, a.name)
         } else {
             write!(f, "[{}] {}", self.context_type, self.context_name)
         }

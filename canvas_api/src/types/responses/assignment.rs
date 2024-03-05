@@ -66,7 +66,7 @@ impl std::cmp::PartialEq for Assignment {
 
 impl std::fmt::Display for Assignment {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.name)
+        write!(f, "[{}] {}", self.id, self.name)
     }
 }
 
@@ -186,6 +186,8 @@ impl std::fmt::Display for AllowedSubmissionType {
 }
 
 fn display_vec<T: std::fmt::Display>(vec: Vec<T>) -> String {
+    const MAX_LINE_LENGTH: usize = 80;
+
     let mut res_str: String;
     if let Some(initial_value) = vec.first() {
         res_str = initial_value.to_string();
@@ -197,7 +199,7 @@ fn display_vec<T: std::fmt::Display>(vec: Vec<T>) -> String {
     for v in vec[1..].iter() {
         // newline if 80 chars
         let new_string = v.to_string();
-        if res_str.len() + new_string.len() + 1 - line_index >= 80 {
+        if res_str.len() + new_string.len() + 2 - line_index >= MAX_LINE_LENGTH {
             res_str.push_str(",\n");
             line_index = res_str.len();
 

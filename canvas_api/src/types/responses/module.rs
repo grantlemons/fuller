@@ -23,7 +23,7 @@ impl std::cmp::PartialEq for Module {
 
 impl std::fmt::Display for Module {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.name)
+        write!(f, "[{}] {}", self.id, self.name)
     }
 }
 
@@ -50,7 +50,7 @@ impl std::cmp::PartialEq for ModuleItem {
 
 impl std::fmt::Display for ModuleItem {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.title)
+        write!(f, "[{}] {}", self.id, self.title)
     }
 }
 
