@@ -2,7 +2,7 @@ use canvas_auth::AccessToken;
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 
-#[derive(Parser)]
+#[derive(Parser, Clone)]
 #[command(version, about, long_about = None)]
 pub struct Cli {
     /// The auth token to use for requests.
@@ -29,7 +29,7 @@ pub struct Cli {
     pub command: Commands,
 }
 
-#[derive(Subcommand)]
+#[derive(Subcommand, Clone)]
 pub enum Commands {
     /// Course subcommands
     /// Lists a user's courses by default
@@ -42,8 +42,6 @@ pub enum Commands {
     /// Todo subcommands
     /// Lists a user's todo list by default
     Todo {
-        todo_id: Option<u64>,
-
         #[command(subcommand)]
         command: Option<TodoCommands>,
     },
@@ -63,23 +61,32 @@ pub enum Commands {
     },
 }
 
-#[derive(Subcommand)]
+#[derive(Subcommand, Clone)]
 pub enum CoursesCommands {
-    Ignore { course_ids: Option<Vec<u64>> },
-    Assignments { assignment_id: Option<u64> },
-    Submit { assignment_id: Option<u64> },
-    Upload { path: Option<PathBuf> },
+    Ignore {
+        course_ids: Option<Vec<u64>>,
+    },
+    Assignments {
+        assignment_id: Option<u64>,
+    },
+    Submit {
+        assignment_id: Option<u64>,
+    },
+    Upload {
+        assignment_id: Option<u64>,
+        path: PathBuf,
+    },
 }
 
-#[derive(Subcommand)]
+#[derive(Subcommand, Clone)]
 pub enum TodoCommands {
-    Ignore { todo_ids: Option<Vec<u64>> },
+    Ignore,
 }
 
-#[derive(Subcommand)]
+#[derive(Subcommand, Clone)]
 pub enum InboxCommands {
     Ignore { inbox_ids: Option<Vec<u64>> },
 }
 
-#[derive(Subcommand)]
+#[derive(Subcommand, Clone)]
 pub enum ProfileCommands {}
