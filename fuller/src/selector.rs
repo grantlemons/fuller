@@ -109,5 +109,52 @@ pub async fn select_assignment(
 }
 
 pub async fn select_todo(request_client: Client, config: &Config) -> Result<Todo, Error> {
-    prompt_selector(get_todo(request_client, config).await?).await
+    let wrapper_vec = TodoDisplayWrapper::wrap_vec(get_todo(request_client, config).await?, config);
+    let wrapped_choice = prompt_selector(wrapper_vec).await?;
+
+    Ok(wrapped_choice.unwrap())
+}
+
+#[derive(Debug)]
+struct TodoDisplayWrapper {
+    todo: Todo,
+    due_date: String,
+}
+
+impl std::fmt::Display for TodoDisplayWrapper {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}{}", self.due_date, self.todo)
+    }
+}
+
+impl TodoDisplayWrapper {
+    pub fn wrap(todo: Todo, config: &Config) -> Self {
+        let rendered_due_date = if let Some(assignment) = &todo.assignment {
+            if let Some(due_at) = assignment.due_at {
+                format!(
+                    "({})  ",
+                    chrono::DateTime::<chrono::Local>::from(due_at)
+                        .format(&fuller_canvas_api::datetime_format(&config))
+                        .to_string()
+                )
+            } else {
+                String::default()
+            }
+        } else {
+            String::default()
+        };
+
+        Self {
+            todo,
+            due_date: rendered_due_date,
+        }
+    }
+
+    pub fn wrap_vec(todo: Vec<Todo>, config: &Config) -> Vec<Self> {
+        todo.into_iter().map(|t| Self::wrap(t, config)).collect()
+    }
+
+    pub fn unwrap(self) -> Todo {
+        self.todo
+    }
 }

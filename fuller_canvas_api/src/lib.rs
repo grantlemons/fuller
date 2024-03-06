@@ -43,7 +43,7 @@ pub mod types {
 }
 
 #[allow(unused)]
-fn datetime_format(config: &fuller_config::Config) -> String {
+pub fn datetime_format(config: &fuller_config::Config) -> String {
     format!("{} {}", config.formatting.date, config.formatting.time)
 }
 
