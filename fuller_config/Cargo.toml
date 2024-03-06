@@ -1,7 +1,7 @@
 [package]
 name = "fuller_config"
 authors = ["Grant Lemons <grantlemons@aol.com>"]
-version = "0.1.0"
+version = "0.1.1"
 description = "Utility used to interact with config files used by the Fuller project"
 repository = "https://github.com/grantlemons/canvas-cli/"
 license = "GPL-3.0-only"
