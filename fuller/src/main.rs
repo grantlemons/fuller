@@ -82,11 +82,11 @@ async fn run_handlers(cli: Cli, request_client: Client, config: &Config) -> Resu
             Some(TodoCommands::Ignore) => handle_ignore_todo(request_client, config).await?,
         },
 
-        Commands::Inbox {
-            inbox_id: _,
-            command,
-        } => match command {
-            None => todo!("Inbox is not yet supported!"),
+        Commands::Inbox { inbox_id, command } => match command {
+            None => println!(
+                "{:?}",
+                select_conversation(request_client, config, inbox_id).await?
+            ),
             Some(_) => todo!("Inbox is not yet supported!"),
         },
 
