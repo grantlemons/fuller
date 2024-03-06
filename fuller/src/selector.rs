@@ -32,6 +32,22 @@ pub fn text_entry(message: &str) -> Result<String, inquire::InquireError> {
     inquire::Editor::new(message).prompt()
 }
 
+pub async fn select_conversation(
+    request_client: Client,
+    config: &Config,
+    conversation_id: Option<u64>,
+) -> Result<Conversation, Error> {
+    if let Some(course_id) = conversation_id {
+        Ok(get_conversation(request_client, config, course_id).await?)
+    } else {
+        let conversation_id =
+            prompt_selector(list_conversations(request_client.to_owned(), config).await?)
+                .await?
+                .id;
+        Ok(get_conversation(request_client, config, conversation_id).await?)
+    }
+}
+
 pub async fn select_course(
     request_client: Client,
     config: &Config,

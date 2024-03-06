@@ -26,6 +26,12 @@ impl std::cmp::PartialEq for ConversationOverview {
 }
 impl crate::types::ResponseType for ConversationOverview {}
 
+impl std::fmt::Display for ConversationOverview {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "[{}] {}", self.id, self.subject)
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct Conversation {
     pub id: u64,
