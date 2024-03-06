@@ -1,15 +1,13 @@
+use anyhow::Error;
 use itertools::Itertools;
-use std::path::PathBuf;
 
-use crate::Error;
 use fuller_canvas_api::Client;
 use fuller_config::Config;
 
-const CONFIG_FILE: &str = "../config.toml";
 async fn setup() -> Result<(Config, Client), Error> {
-    let config = fuller_config::get_config(Some(PathBuf::from(CONFIG_FILE)))?;
+    let config: Config = fuller_config::get_config(None)?;
     let auth_token = fuller_canvas_auth::connect(&config).await?;
-    let client = fuller_canvas_api::create_client(auth_token, &config)?;
+    let client: Client = fuller_canvas_api::create_client(auth_token, &config)?;
 
     Ok((config, client))
 }
