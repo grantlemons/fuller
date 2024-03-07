@@ -11,10 +11,10 @@ categories = ["command-line-utilities"]
 edition = "2021"
 
 [dependencies]
+fuller_cli_options = { version = "0.1.0", path = "../fuller_cli_options" }
+fuller_config = { version = "0.1.0", path = "../fuller_config" }
 fuller_canvas_api = { version = "0.1.0", path = "../fuller_canvas_api" }
 fuller_canvas_auth = { version = "0.1.0", path = "../fuller_canvas_auth" }
-fuller_config = { version = "0.1.0", path = "../fuller_config" }
-clap = { version = "4.5.0", features = ["derive"] }
 inquire = { version = "0.6.2", features = ["editor"] }
 serde = { version = "1.0.196", features = ["serde_derive"] }
 thiserror = "1.0.57"
@@ -25,3 +25,8 @@ tracing-subscriber = "0.3.18"
 [dev-dependencies]
 anyhow = "1.0.80"
 itertools = "0.12.1"
+
+[build-dependencies]
+fuller_cli_options = { version = "0.1.0", path = "../fuller_cli_options" }
+clap = { version = "4.5.2", features = ["derive"] }
+clap_mangen = "0.2.20"

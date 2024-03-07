@@ -2,8 +2,9 @@
 
 resolver = "2"
 members = [
-    "fuller_canvas_api",
     "fuller",
-    "fuller_canvas_auth",
+    "fuller_cli_options",
     "fuller_config",
+    "fuller_canvas_api",
+    "fuller_canvas_auth",
 ]

@@ -1,18 +1,16 @@
-use clap::Parser;
 use fuller_canvas_api::Client;
 use fuller_canvas_api::Viewable;
+use fuller_cli_options::*;
 use fuller_config::Config;
 use selector::*;
 use std::{fs::File, sync::Mutex};
 use tracing::{info, warn, Level};
 use tracing_subscriber::FmtSubscriber;
 
-mod cli;
 mod error;
 mod handlers;
 mod selector;
 
-use cli::*;
 pub use error::Error;
 use handlers::*;
 

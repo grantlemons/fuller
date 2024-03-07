@@ -1,10 +1,10 @@
-use crate::cli::Cli;
 use crate::error::Error;
 use crate::selector::*;
 use fuller_canvas_api::requests::*;
 use fuller_canvas_api::types::*;
 use fuller_canvas_api::upload_to_assignment;
 use fuller_canvas_api::Client;
+use fuller_cli_options::*;
 use fuller_config::associate_submission_file;
 use fuller_config::dissassociate_submission_files;
 use fuller_config::Config;

@@ -1,5 +1,6 @@
+pub use clap::Parser;
+use clap::Subcommand;
 use fuller_canvas_auth::AccessToken;
-use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 
 #[derive(Parser, Clone)]

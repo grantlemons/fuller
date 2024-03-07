@@ -1,0 +1,15 @@
+[package]
+name = "fuller_cli_options"
+authors = ["Grant Lemons <grantlemons@aol.com>"]
+version = "0.1.0"
+description = "Library to get options passed to the Fuller project"
+repository = "https://github.com/grantlemons/canvas-cli/"
+license = "GPL-3.0-only"
+readme = "../README.md"
+keywords = ["canvas", "lms", "canvas-cli", "fuller"]
+categories = ["command-line-utilities"]
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.5.0", features = ["derive"] }
+fuller_canvas_auth = { version = "0.1.0", path = "../fuller_canvas_auth" }
