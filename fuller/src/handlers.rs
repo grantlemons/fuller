@@ -18,13 +18,15 @@ pub async fn ignore_courses(
     config: &Config,
     course_ids: Option<Vec<u64>>,
 ) -> Result<(), Error> {
-    let course_ids = course_ids.unwrap_or(
+    let course_ids = if let Some(course_ids) = course_ids {
+        course_ids
+    } else {
         select_courses(request_client, config, None)
             .await?
             .into_iter()
             .map(|c| c.id)
-            .collect(),
-    );
+            .collect()
+    };
 
     for course_id in course_ids {
         info!("User ignored course {}", course_id);
@@ -68,11 +70,13 @@ pub async fn handle_submit(
     course_id: Option<u64>,
     assignment_id: Option<u64>,
 ) -> Result<(), Error> {
-    let course_id = course_id.unwrap_or(
+    let course_id = if let Some(course_id) = course_id {
+        course_id
+    } else {
         select_course(request_client.clone(), config, None)
             .await?
-            .id,
-    );
+            .id
+    };
 
     let assignment = if let Some(assignment_id) = assignment_id {
         get_assignment(request_client.clone(), config, course_id, assignment_id).await?
@@ -163,11 +167,13 @@ pub async fn handle_upload_file(
     course_id: Option<u64>,
     assignment_id: Option<u64>,
 ) -> Result<(), Error> {
-    let course_id = course_id.unwrap_or(
+    let course_id = if let Some(course_id) = course_id {
+        course_id
+    } else {
         select_course(request_client.clone(), config, None)
             .await?
-            .id,
-    );
+            .id
+    };
 
     let assignment = if let Some(assignment_id) = assignment_id {
         get_assignment(request_client.clone(), config, course_id, assignment_id).await?
