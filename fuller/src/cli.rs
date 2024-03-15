@@ -1,8 +1,8 @@
-use fuller_canvas_auth::AccessToken;
 use clap::{Parser, Subcommand};
+use fuller_canvas_auth::AccessToken;
 use std::path::PathBuf;
 
-#[derive(Parser, Clone)]
+#[derive(Parser, Clone, Debug)]
 #[command(version, about, long_about = None)]
 pub struct Cli {
     /// The auth token to use for requests.
@@ -29,7 +29,7 @@ pub struct Cli {
     pub command: Commands,
 }
 
-#[derive(Subcommand, Clone)]
+#[derive(Subcommand, Clone, Debug)]
 pub enum Commands {
     /// Course subcommands
     /// Lists a user's courses by default
@@ -61,7 +61,7 @@ pub enum Commands {
     },
 }
 
-#[derive(Subcommand, Clone)]
+#[derive(Subcommand, Clone, Debug)]
 pub enum CoursesCommands {
     Ignore {
         course_ids: Option<Vec<u64>>,
@@ -78,15 +78,15 @@ pub enum CoursesCommands {
     },
 }
 
-#[derive(Subcommand, Clone)]
+#[derive(Subcommand, Clone, Debug)]
 pub enum TodoCommands {
     Ignore,
 }
 
-#[derive(Subcommand, Clone)]
+#[derive(Subcommand, Clone, Debug)]
 pub enum InboxCommands {
     Ignore { inbox_ids: Option<Vec<u64>> },
 }
 
-#[derive(Subcommand, Clone)]
+#[derive(Subcommand, Clone, Debug)]
 pub enum ProfileCommands {}
