@@ -34,6 +34,7 @@ pub enum Commands {
     /// Course subcommands
     /// Lists a user's courses by default
     Courses {
+        #[arg(long, short)]
         course_id: Option<u64>,
 
         #[command(subcommand)]
@@ -48,6 +49,7 @@ pub enum Commands {
     /// Inbox subcommands
     /// Views a user's inbox contents by default
     Inbox {
+        #[arg(long, short)]
         inbox_id: Option<u64>,
 
         #[command(subcommand)]
@@ -73,8 +75,8 @@ pub enum CoursesCommands {
         assignment_id: Option<u64>,
     },
     Upload {
-        assignment_id: Option<u64>,
         path: PathBuf,
+        assignment_id: Option<u64>,
     },
 }
 
