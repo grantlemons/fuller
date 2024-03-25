@@ -4,7 +4,7 @@ authors = ["Grant Lemons <grantlemons@aol.com>"]
 version = "0.1.3"
 description = "API library used to interact with Canvas LMS used by the Fuller project"
 repository = "https://github.com/grantlemons/canvas-cli/"
-license = "GPL-3.0-only"
+license = "AGPL-3.0-only"
 keywords = ["canvas_api", "fuller"]
 edition = "2021"
 
