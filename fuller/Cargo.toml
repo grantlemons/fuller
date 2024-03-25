@@ -1,7 +1,7 @@
 [package]
 name = "fuller"
 authors = ["Grant Lemons <grantlemons@aol.com>"]
-version = "0.1.2"
+version = "0.1.3"
 description = "CLI tool used to interact with Instructure Canvas LMS"
 repository = "https://github.com/grantlemons/canvas-cli/"
 license = "GPL-3.0-only"
@@ -11,9 +11,9 @@ categories = ["command-line-utilities"]
 edition = "2021"
 
 [dependencies]
-fuller_canvas_api = { version = "0.1.2", path = "../fuller_canvas_api" }
-fuller_canvas_auth = { version = "0.1.2", path = "../fuller_canvas_auth" }
-fuller_config = { version = "0.1.2", path = "../fuller_config" }
+fuller_canvas_api = { version = "0.1.3", path = "../fuller_canvas_api" }
+fuller_canvas_auth = { version = "0.1.3", path = "../fuller_canvas_auth" }
+fuller_config = { version = "0.1.3", path = "../fuller_config" }
 clap = { version = "4.5.0", features = ["derive"] }
 inquire = { version = "0.6.2", features = ["editor"] }
 serde = { version = "1.0.196", features = ["serde_derive"] }
