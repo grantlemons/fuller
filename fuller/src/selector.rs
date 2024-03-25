@@ -109,7 +109,9 @@ pub async fn select_assignment(
 }
 
 pub async fn select_todo(request_client: Client, config: &Config) -> Result<Todo, Error> {
-    let wrapper_vec = TodoDisplayWrapper::wrap_vec(get_todo(request_client, config).await?, config);
+    let mut wrapper_vec =
+        TodoDisplayWrapper::wrap_vec(get_todo(request_client, config).await?, config);
+    wrapper_vec.sort_by_key(|a| a.due_date.to_owned());
     let wrapped_choice = prompt_selector(wrapper_vec).await?;
 
     Ok(wrapped_choice.unwrap())
