@@ -1,7 +1,7 @@
 [package]
 name = "fuller_canvas_api"
 authors = ["Grant Lemons <grantlemons@aol.com>"]
-version = "0.1.2"
+version = "0.1.3"
 description = "API library used to interact with Canvas LMS used by the Fuller project"
 repository = "https://github.com/grantlemons/canvas-cli/"
 license = "GPL-3.0-only"
@@ -9,8 +9,8 @@ keywords = ["canvas_api", "fuller"]
 edition = "2021"
 
 [dependencies]
-fuller_canvas_auth = { version = "0.1.2", path = "../fuller_canvas_auth" }
-fuller_config = { version = "0.1.2", path = "../fuller_config" }
+fuller_canvas_auth = { version = "0.1.3", path = "../fuller_canvas_auth" }
+fuller_config = { version = "0.1.3", path = "../fuller_config" }
 thiserror = "1.0.57"
 chrono = { version = "0.4.34", features = ["serde"] }
 reqwest = { version = "0.11.24", features = ["json", "multipart"] }
