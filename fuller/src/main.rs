@@ -84,8 +84,10 @@ async fn run_handlers(cli: Cli, request_client: Client, config: &Config) -> Resu
 
         Commands::Inbox { inbox_id, command } => match command {
             None => println!(
-                "{:?}",
-                select_conversation(request_client, config, inbox_id).await?
+                "{}",
+                select_conversation(request_client, config, inbox_id)
+                    .await?
+                    .view(config)
             ),
             Some(_) => todo!("Inbox is not yet supported!"),
         },
