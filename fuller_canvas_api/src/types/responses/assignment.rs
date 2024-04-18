@@ -38,14 +38,14 @@ pub struct Assignment {
     pub grading_type: GradingType,
     // pub only_visible_to_overrides: bool,
     pub locked_for_user: bool,
-    // pub lock_info: Option<>, // is seperate object
+    // pub lock_info: Option<>, // is separate object
     pub lock_explanation: Option<String>,
     pub discussion_topic: Option<Discussion>,
     // pub overrides: (),
     pub omit_from_final_grade: Option<bool>,
     // pub grader_count: u64,
     pub final_grader_id: Option<u64>,
-    pub allowed_attemps: Option<i64>,
+    pub allowed_attempts: Option<i64>,
     pub post_manually: bool,
     // pub score_statistics: (),
     pub can_submit: Option<bool>,

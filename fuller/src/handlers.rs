@@ -6,7 +6,7 @@ use fuller_canvas_api::types::*;
 use fuller_canvas_api::upload_to_assignment;
 use fuller_canvas_api::Client;
 use fuller_config::associate_submission_file;
-use fuller_config::dissassociate_submission_files;
+use fuller_config::disassociate_submission_files;
 use fuller_config::Config;
 use fuller_config::ConfigIgnore;
 use std::path::{Path, PathBuf};
@@ -133,8 +133,8 @@ pub async fn handle_submit(
                     .collect(),
             );
 
-            info!("Dissassociating submission files!");
-            dissassociate_submission_files(cli.config.to_owned(), assignment.id)?;
+            info!("Disassociating submission files!");
+            disassociate_submission_files(cli.config.to_owned(), assignment.id)?;
 
             res
         }

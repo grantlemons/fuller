@@ -11,6 +11,6 @@ pub async fn connect(config: &Config) -> Result<AccessToken, AuthError> {
     };
     let access_token = AccessToken::from(token);
 
-    info!("Token Auth Proccess Complete!");
+    info!("Token Auth Process Complete!");
     Ok(access_token)
 }

@@ -152,7 +152,7 @@ pub fn associate_submission_file(
     Ok(toml_edit::de::from_document::<Config>(doc)?)
 }
 
-pub fn dissassociate_submission_files(
+pub fn disassociate_submission_files(
     path: Option<PathBuf>,
     assignment_id: u64,
 ) -> Result<Config, ConfigError> {

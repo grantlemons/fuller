@@ -74,6 +74,6 @@ pub async fn connect(_: &fuller_config::Config) -> Result<crate::AccessToken, Au
     let expires_in = response.expires_in();
     let refresh_token = response.refresh_token();
 
-    info!("OAuth2 Auth Proccess Complete!");
+    info!("OAuth2 Auth Process Complete!");
     Ok(access_token.secret().to_owned().into())
 }
