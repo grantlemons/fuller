@@ -117,6 +117,25 @@ pub async fn select_todo(request_client: Client, config: &Config) -> Result<Todo
     Ok(wrapped_choice.unwrap())
 }
 
+pub async fn select_course_todo(
+    request_client: Client,
+    config: &Config,
+    course_id: Option<u64>,
+) -> Result<Todo, Error> {
+    let course_id = select_course(request_client.clone(), config, course_id)
+        .await?
+        .id;
+
+    let mut wrapper_vec = TodoDisplayWrapper::wrap_vec(
+        get_course_todo(request_client, config, course_id).await?,
+        config,
+    );
+    wrapper_vec.sort_by_key(|a| a.due_date.to_owned());
+    let wrapped_choice = prompt_selector(wrapper_vec).await?;
+
+    Ok(wrapped_choice.unwrap())
+}
+
 #[derive(Debug)]
 struct TodoDisplayWrapper {
     todo: Todo,

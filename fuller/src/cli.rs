@@ -66,6 +66,10 @@ pub enum CoursesCommands {
     Ignore {
         course_ids: Option<Vec<u64>>,
     },
+    Todo {
+        #[command(subcommand)]
+        command: Option<TodoCommands>,
+    },
     Assignments {
         assignment_id: Option<u64>,
     },

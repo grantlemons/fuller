@@ -13,7 +13,8 @@ Root Level
 
 Courses Commands
 
-- [ ] List Todo
+- [x] List Todo
+- [x] Ignore Todo
 - [ ] List Discussions
 - [ ] List Grades (Only graded submissions?)
 - [x] List Assignments

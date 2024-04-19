@@ -215,3 +215,23 @@ pub async fn handle_ignore_todo(request_client: Client, config: &Config) -> Resu
 
     Ok(())
 }
+
+pub async fn handle_ignore_course_todo(
+    request_client: Client,
+    config: &Config,
+    course_id: Option<u64>,
+) -> Result<(), Error> {
+    let course_id = select_course(request_client.clone(), config, course_id)
+        .await?
+        .id;
+
+    let choices =
+        prompt_multiselector(get_course_todo(request_client.to_owned(), config, course_id).await?)
+            .await?;
+
+    for choice in choices {
+        ignore_todo(request_client.to_owned(), config, &choice).await?;
+    }
+
+    Ok(())
+}
