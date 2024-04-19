@@ -55,6 +55,17 @@ async fn run_handlers(cli: Cli, request_client: Client, config: &Config) -> Resu
             Some(CoursesCommands::Ignore { course_ids }) => {
                 ignore_courses(&cli, request_client, config, course_ids).await?
             }
+            Some(CoursesCommands::Todo { command }) => match command {
+                None => println!(
+                    "{}",
+                    select_course_todo(request_client, config, course_id)
+                        .await?
+                        .view(config)
+                ),
+                Some(TodoCommands::Ignore) => {
+                    handle_ignore_course_todo(request_client, config, course_id).await?
+                }
+            },
             Some(CoursesCommands::Upload {
                 assignment_id,
                 path,
